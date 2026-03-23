@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "checkJs": true,
+    "types": ["p5/global"],
+    "module": "esnext",
+    "lib": ["DOM", "ES6"],
+    "outDir": "./dist",
+    "rootDir": "./",
+    "strict": true,
+    "sourceMap": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true
+  },
+  "include": [
+    "*.ts",
+    "**/*.ts",
+    "/Users/lindapham/.vscode/extensions/samplavigne.p5-vscode-1.2.16/p5types/global.d.ts"
+, "sketch.ts"  ],
+"exclude": ["node_modules", "libraries", "dist"]
+}
