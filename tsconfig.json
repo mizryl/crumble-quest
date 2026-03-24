@@ -13,9 +13,14 @@
     "esModuleInterop": true
   },
   "include": [
-    "*.ts",
+    // "*.ts",
+    "sketch.ts",
     "**/*.ts",
-    "/Users/lindapham/.vscode/extensions/samplavigne.p5-vscode-1.2.16/p5types/global.d.ts"
-, "sketch.ts"  ],
-"exclude": ["node_modules", "libraries", "dist"]
+    "src/**/*.ts"
+    ],
+"exclude": 
+["node_modules", 
+"libraries", 
+"dist",
+".vscode"]
 }
