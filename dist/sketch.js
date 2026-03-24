@@ -12,6 +12,8 @@ function preload() {
     cloudImg = loadImage('assets/img/cloud.png');
 }
 function setup() {
+    // noSmooth();
+    pixelDensity(1);
     console.log("Setup is running!");
     let w = Math.max(windowWidth, MIN_WIDTH);
     let h = Math.max(windowHeight, MIN_HEIGHT);
@@ -42,6 +44,9 @@ function draw() {
 function mousePressed() {
     switch (gameState) {
         case "START":
+            if (startBtn && startBtn.isClicked()) {
+                startGame();
+            }
             break;
         case "RESULTS":
             break;
@@ -65,18 +70,17 @@ function drawResults() {
 function drawCloudBorder() {
     fill(255, 255, 255, 200);
     noStroke();
-    // Draw a bunch of overlapping circles around the edges
-    // You can loop this to cover the whole perimeter!
     for (let i = 0; i < width; i += 80) {
-        //top 
-        ellipse(i, 20, 150, 100);
-        //btm
-        ellipse(i, height - 20, 150, 100);
+        ellipse(i, 20, 150, 100); //top
+        ellipse(i, height - 20, 150, 100); //btm
     }
     for (let j = 0; j < height; j += 80) {
         ellipse(20, j, 100, 150); //left
         ellipse(width - 20, j, 100, 150); //right
     }
+}
+function startGame() {
+    gameState = "PLAYING";
 }
 window.preload = preload;
 window.setup = setup;
