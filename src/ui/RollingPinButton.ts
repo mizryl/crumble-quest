@@ -15,8 +15,10 @@ export class RollingPinButton extends Button {
         translate(this.x, this.y);
 
         if (this.isHovered) {
+            
             this.rot = lerp(this.rot, 0.1, 0.1);
             scale(1.05);
+
         } else {
             this.rot = lerp(this.rot, 0, 0.1);
         }

@@ -1,8 +1,25 @@
+import { Image } from 'p5';
 import { RollingPinButton } from './src/ui/RollingPinButton.js';
+import { TileManager } from './src/world/TileManager.js';
+import { Player } from './src/entities/Player.js'
+
+import { SpriteData } from './src/interface.js';
+
+
 
 let startBtn: RollingPinButton;
 let loadBtn: RollingPinButton;
 
+let tileM: TileManager = new TileManager();
+let mapData: string[];
+let playerSprites: SpriteData = {
+  up: [],
+  down: [],
+  left: [],
+  right: []
+};
+
+let player: Player;
 let gameState: "START" | "PLAYING" | "RESULTS";
 
 const MIN_WIDTH = 1280;
@@ -14,8 +31,28 @@ let cloudImg: any;
 let dayCount = 0;
 
 function preload(): void {
+  //tiles
   font = loadFont('assets/fonts/PixelCode-Bold.ttf');
   cloudImg = loadImage('assets/img/cloud.png');
+  mapData = loadStrings('assets/map.txt');
+  tileM.load();
+
+  //player
+  for (let i = 0; i <= 4; i++) {
+    playerSprites.up.push(loadImage(`assets/img/c1up${i}.png`));
+    playerSprites.down.push(loadImage(`assets/img/c1down${i}.png`));
+    playerSprites.left.push(loadImage(`assets/img/c1left${i}.png`));
+    playerSprites.right.push(loadImage(`assets/img/c1right${i}.png`));
+  }
+
+  if (player) {
+    player.update();
+    player.display();
+  }
+
+  
+
+
 }
 
 function setup(): void {
@@ -25,6 +62,7 @@ function setup(): void {
   let w = Math.max(windowWidth, MIN_WIDTH);
   let h = Math.max(windowHeight, MIN_HEIGHT);
   createCanvas(w, h);
+  tileM.parseLoadedMap(mapData);
   
   startBtn = new RollingPinButton(w / 2, h / 2, "NEW GAME");
   loadBtn = new RollingPinButton(w / 2, h / 2 + 200, "LOAD GAME");
@@ -34,6 +72,9 @@ function setup(): void {
   textFont(font);
   textAlign(CENTER, CENTER);
   console.log("Game initialized in START state");
+
+  player = new Player(30, 30, playerSprites);
+
 }
 
 function draw(): void {
@@ -51,17 +92,15 @@ function draw(): void {
       drawResults();
       break;
   }
-
-  // textSize(100);
-  // text("CRUMBLE QUEST", width/2, height/2 - 300);
-
 }
 
 function mousePressed(): void {
   switch (gameState) {
     case "START":
       if (startBtn && startBtn.isClicked()) {
-        startGame();
+        // startGame();
+        gameState = "PLAYING";
+        
       }
       break;
     case "RESULTS":
@@ -81,13 +120,15 @@ function drawMainMenu(): void {
   textSize(100);
   text("CRUMBLE QUEST", width/2, (height/2) + bob - 300);
   drawCloudBorder();
+
   startBtn.display();
   loadBtn.display();
-
 }
 
 function drawGameWorld(): void {
-
+  background(235, 226, 214);
+  tileM.display();
+  text("test", width/2, height/2);
 }
 
 function drawResults(): void {

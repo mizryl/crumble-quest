@@ -1,6 +1,17 @@
 import { RollingPinButton } from './src/ui/RollingPinButton.js';
+import { TileManager } from './src/world/TileManager.js';
+import { Player } from './src/entities/Player.js';
 let startBtn;
 let loadBtn;
+let tileM = new TileManager();
+let mapData;
+let playerSprites = {
+    up: [],
+    down: [],
+    left: [],
+    right: []
+};
+let player;
 let gameState;
 const MIN_WIDTH = 1280;
 const MIN_HEIGHT = 704;
@@ -8,8 +19,22 @@ let font;
 let cloudImg;
 let dayCount = 0;
 function preload() {
+    //tiles
     font = loadFont('assets/fonts/PixelCode-Bold.ttf');
     cloudImg = loadImage('assets/img/cloud.png');
+    mapData = loadStrings('assets/map.txt');
+    tileM.load();
+    //player
+    for (let i = 0; i <= 4; i++) {
+        playerSprites.up.push(loadImage(`assets/img/c1up${i}.png`));
+        playerSprites.down.push(loadImage(`assets/img/c1down${i}.png`));
+        playerSprites.left.push(loadImage(`assets/img/c1left${i}.png`));
+        playerSprites.right.push(loadImage(`assets/img/c1right${i}.png`));
+    }
+    if (player) {
+        player.update();
+        player.display();
+    }
 }
 function setup() {
     // noSmooth();
@@ -18,12 +43,14 @@ function setup() {
     let w = Math.max(windowWidth, MIN_WIDTH);
     let h = Math.max(windowHeight, MIN_HEIGHT);
     createCanvas(w, h);
+    tileM.parseLoadedMap(mapData);
     startBtn = new RollingPinButton(w / 2, h / 2, "NEW GAME");
     loadBtn = new RollingPinButton(w / 2, h / 2 + 200, "LOAD GAME");
     gameState = "START";
     textFont(font);
     textAlign(CENTER, CENTER);
     console.log("Game initialized in START state");
+    player = new Player(30, 30, playerSprites);
 }
 function draw() {
     background(235, 226, 214);
@@ -38,14 +65,13 @@ function draw() {
             drawResults();
             break;
     }
-    // textSize(100);
-    // text("CRUMBLE QUEST", width/2, height/2 - 300);
 }
 function mousePressed() {
     switch (gameState) {
         case "START":
             if (startBtn && startBtn.isClicked()) {
-                startGame();
+                // startGame();
+                gameState = "PLAYING";
             }
             break;
         case "RESULTS":
@@ -64,6 +90,9 @@ function drawMainMenu() {
     loadBtn.display();
 }
 function drawGameWorld() {
+    background(235, 226, 214);
+    tileM.display();
+    text("test", width / 2, height / 2);
 }
 function drawResults() {
 }
