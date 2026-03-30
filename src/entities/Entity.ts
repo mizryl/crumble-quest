@@ -7,9 +7,11 @@ export abstract class Entity {
     public right: Image[] = [];
     protected currentAnimation: Image[] = [];
     protected currentFrame: number = 0;
+    protected spriteCounter: number = 0;
     
     public x: number;
     public y: number;
+    public speed: number;
     // public moving: boolean;
     // public speed: number;
 
@@ -22,6 +24,7 @@ export abstract class Entity {
         this.right = sprites.right;
         this.x = x;
         this.y = y;
+        this.speed = speed;
         // this.moving = moving;
         // this.speed = speed;
         this.currentAnimation = this.down;

@@ -6,10 +6,11 @@ export class KeyHandler {
     public rightPressed: boolean = false;
 
     handlePressed(k: string): void {
-        if (k == 'w') this.upPressed = true;
+        if (keyIsDown(0x77)) this.upPressed = true;
         if (k == 's') this.downPressed = true;
         if (k == 'a') this.leftPressed = true;
         if (k == 'd') this.rightPressed = true;
+        
     }
 
     handleReleased(k: string): void {

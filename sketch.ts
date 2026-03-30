@@ -4,6 +4,7 @@ import { TileManager } from './src/world/TileManager.js';
 import { Player } from './src/entities/Player.js'
 
 import { SpriteData } from './src/interface.js';
+import { KeyHandler } from './src/entities/KeyHandler.js';
 
 
 
@@ -20,6 +21,7 @@ let playerSprites: SpriteData = {
 };
 
 let player: Player;
+let keyH: KeyHandler;
 let gameState: "START" | "PLAYING" | "RESULTS";
 
 const MIN_WIDTH = 1280;
@@ -45,10 +47,10 @@ function preload(): void {
     playerSprites.right.push(loadImage(`assets/img/c1right${i}.png`));
   }
 
-  if (player) {
-    player.update();
-    player.display();
-  }
+  // if (player) {
+  //   player.update();
+  //   player.display();
+  // }
 
   
 
@@ -74,6 +76,7 @@ function setup(): void {
   console.log("Game initialized in START state");
 
   player = new Player(windowWidth/2, windowHeight/2, playerSprites);
+  keyH = new KeyHandler;
 
 }
 
@@ -129,9 +132,11 @@ function drawGameWorld(): void {
   background(235, 226, 214);
   tileM.display();
   text("test", width/2, height/2);
+  
   if (player) {
     player.update();
     player.display();
+
   }
 
 }
@@ -158,6 +163,20 @@ function drawCloudBorder() {
 function startGame(): void {
   gameState = "PLAYING";
   
+}
+
+function keyPressed() {
+  if (gameState == "PLAYING") {
+    keyH.handlePressed(key);
+  }
+  
+}
+
+function keyReleased() {
+  if (gameState == "PLAYING") {
+    keyH.handleReleased(key);
+  }
+
 }
 
 (window as any).preload = preload;

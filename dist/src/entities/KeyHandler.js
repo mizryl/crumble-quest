@@ -6,7 +6,7 @@ export class KeyHandler {
         this.rightPressed = false;
     }
     handlePressed(k) {
-        if (k == 'w')
+        if (keyIsDown(0x77))
             this.upPressed = true;
         if (k == 's')
             this.downPressed = true;

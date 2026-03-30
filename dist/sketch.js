@@ -1,6 +1,7 @@
 import { RollingPinButton } from './src/ui/RollingPinButton.js';
 import { TileManager } from './src/world/TileManager.js';
 import { Player } from './src/entities/Player.js';
+import { KeyHandler } from './src/entities/KeyHandler.js';
 let startBtn;
 let loadBtn;
 let tileM = new TileManager();
@@ -12,6 +13,7 @@ let playerSprites = {
     right: []
 };
 let player;
+let keyH;
 let gameState;
 const MIN_WIDTH = 1280;
 const MIN_HEIGHT = 704;
@@ -31,10 +33,10 @@ function preload() {
         playerSprites.left.push(loadImage(`assets/img/c1left${i}.png`));
         playerSprites.right.push(loadImage(`assets/img/c1right${i}.png`));
     }
-    if (player) {
-        player.update();
-        player.display();
-    }
+    // if (player) {
+    //   player.update();
+    //   player.display();
+    // }
 }
 function setup() {
     // noSmooth();
@@ -51,6 +53,7 @@ function setup() {
     textAlign(CENTER, CENTER);
     console.log("Game initialized in START state");
     player = new Player(windowWidth / 2, windowHeight / 2, playerSprites);
+    keyH = new KeyHandler;
 }
 function draw() {
     background(235, 226, 214);
@@ -114,6 +117,16 @@ function drawCloudBorder() {
 }
 function startGame() {
     gameState = "PLAYING";
+}
+function keyPressed() {
+    if (gameState == "PLAYING") {
+        keyH.handlePressed(key);
+    }
+}
+function keyReleased() {
+    if (gameState == "PLAYING") {
+        keyH.handleReleased(key);
+    }
 }
 window.preload = preload;
 window.setup = setup;

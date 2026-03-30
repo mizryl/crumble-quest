@@ -8,12 +8,14 @@ export class Entity {
         this.right = [];
         this.currentAnimation = [];
         this.currentFrame = 0;
+        this.spriteCounter = 0;
         this.up = sprites.up;
         this.down = sprites.down;
         this.left = sprites.left;
         this.right = sprites.right;
         this.x = x;
         this.y = y;
+        this.speed = speed;
         // this.moving = moving;
         // this.speed = speed;
         this.currentAnimation = this.down;
