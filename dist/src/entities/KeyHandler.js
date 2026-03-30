@@ -6,23 +6,25 @@ export class KeyHandler {
         this.rightPressed = false;
     }
     handlePressed(k) {
-        if (keyIsDown(0x77))
+        let keyLower = k.toLowerCase();
+        if (keyLower === 'w')
             this.upPressed = true;
-        if (k == 's')
+        if (keyLower === 's')
             this.downPressed = true;
-        if (k == 'a')
+        if (keyLower === 'a')
             this.leftPressed = true;
-        if (k == 'd')
+        if (keyLower === 'd')
             this.rightPressed = true;
     }
     handleReleased(k) {
-        if (k == 'w')
+        let keyLower = k.toLowerCase();
+        if (keyLower === 'w')
             this.upPressed = false;
-        if (k == 's')
+        if (keyLower === 's')
             this.downPressed = false;
-        if (k == 'a')
+        if (keyLower === 'a')
             this.leftPressed = false;
-        if (k == 'd')
+        if (keyLower === 'd')
             this.rightPressed = false;
     }
 }

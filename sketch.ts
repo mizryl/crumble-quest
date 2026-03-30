@@ -75,8 +75,10 @@ function setup(): void {
   textAlign(CENTER, CENTER);
   console.log("Game initialized in START state");
 
-  player = new Player(windowWidth/2, windowHeight/2, playerSprites);
-  keyH = new KeyHandler;
+  keyH = new KeyHandler();
+  player = new Player(windowWidth/2, windowHeight/2, playerSprites, keyH);
+  
+
 
 }
 
@@ -89,6 +91,7 @@ function draw(): void {
       break;
     case "PLAYING":
       drawGameWorld();
+      
       break;
 
     case "RESULTS":
@@ -132,7 +135,6 @@ function drawGameWorld(): void {
   background(235, 226, 214);
   tileM.display();
   text("test", width/2, height/2);
-  
   if (player) {
     player.update();
     player.display();
@@ -167,14 +169,14 @@ function startGame(): void {
 
 function keyPressed() {
   if (gameState == "PLAYING") {
-    keyH.handlePressed(key);
+    player.keyH.handlePressed(key);
   }
   
 }
 
 function keyReleased() {
   if (gameState == "PLAYING") {
-    keyH.handleReleased(key);
+    player.keyH.handleReleased(key);
   }
 
 }
@@ -183,3 +185,5 @@ function keyReleased() {
 (window as any).setup = setup;
 (window as any).draw = draw;
 (window as any).mousePressed = mousePressed;
+(window as any).keyPressed = keyPressed;
+(window as any).keyReleased = keyReleased;

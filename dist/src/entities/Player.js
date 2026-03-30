@@ -1,34 +1,35 @@
 import { Entity } from './Entity.js';
-import { KeyHandler } from "./KeyHandler.js";
 export class Player extends Entity {
-    constructor(x, y, sprites) {
+    constructor(x, y, sprites, keyH) {
         super(x, y, false, 4, sprites);
         this.tileSize = 128;
-        this.keyH = new KeyHandler;
         this.currentFrame = 0;
+        this.moving = false;
+        this.keyH = keyH;
         this.currentAnimation = this.down;
     }
     update() {
-        let moving = this.keyH.upPressed || this.keyH.downPressed ||
+        this.moving = this.keyH.upPressed || this.keyH.downPressed ||
             this.keyH.leftPressed || this.keyH.rightPressed;
         if (this.keyH.upPressed) {
             this.currentAnimation = this.up;
             this.y -= this.speed;
+            this.moving = true;
             console.log("UP");
         }
-        else if (this.keyH.downPressed) {
+        if (this.keyH.downPressed) {
             this.currentAnimation = this.down;
             this.y += this.speed;
         }
-        else if (this.keyH.leftPressed) {
+        if (this.keyH.leftPressed) {
             this.currentAnimation = this.left;
             this.x -= this.speed;
         }
-        else if (this.keyH.rightPressed) {
+        if (this.keyH.rightPressed) {
             this.currentAnimation = this.right;
             this.x += this.speed;
         }
-        if (!moving) {
+        if (!this.moving) {
             this.currentFrame = 0;
         }
         else {

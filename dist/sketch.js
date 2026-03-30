@@ -52,8 +52,8 @@ function setup() {
     textFont(font);
     textAlign(CENTER, CENTER);
     console.log("Game initialized in START state");
-    player = new Player(windowWidth / 2, windowHeight / 2, playerSprites);
-    keyH = new KeyHandler;
+    keyH = new KeyHandler();
+    player = new Player(windowWidth / 2, windowHeight / 2, playerSprites, keyH);
 }
 function draw() {
     background(235, 226, 214);
@@ -120,16 +120,18 @@ function startGame() {
 }
 function keyPressed() {
     if (gameState == "PLAYING") {
-        keyH.handlePressed(key);
+        player.keyH.handlePressed(key);
     }
 }
 function keyReleased() {
     if (gameState == "PLAYING") {
-        keyH.handleReleased(key);
+        player.keyH.handleReleased(key);
     }
 }
 window.preload = preload;
 window.setup = setup;
 window.draw = draw;
 window.mousePressed = mousePressed;
+window.keyPressed = keyPressed;
+window.keyReleased = keyReleased;
 //# sourceMappingURL=sketch.js.map
