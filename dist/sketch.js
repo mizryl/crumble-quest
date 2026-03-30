@@ -25,7 +25,7 @@ function preload() {
     mapData = loadStrings('assets/map.txt');
     tileM.load();
     //player
-    for (let i = 0; i <= 4; i++) {
+    for (let i = 1; i <= 4; i++) {
         playerSprites.up.push(loadImage(`assets/img/c1up${i}.png`));
         playerSprites.down.push(loadImage(`assets/img/c1down${i}.png`));
         playerSprites.left.push(loadImage(`assets/img/c1left${i}.png`));
@@ -50,7 +50,7 @@ function setup() {
     textFont(font);
     textAlign(CENTER, CENTER);
     console.log("Game initialized in START state");
-    player = new Player(30, 30, playerSprites);
+    player = new Player(windowWidth / 2, windowHeight / 2, playerSprites);
 }
 function draw() {
     background(235, 226, 214);
@@ -93,6 +93,10 @@ function drawGameWorld() {
     background(235, 226, 214);
     tileM.display();
     text("test", width / 2, height / 2);
+    if (player) {
+        player.update();
+        player.display();
+    }
 }
 function drawResults() {
 }

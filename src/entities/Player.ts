@@ -4,11 +4,11 @@ import { SpriteData } from "../interface.js";
 import { KeyHandler } from "./KeyHandler.js";
 
 export class Player extends Entity {
-    keyH: KeyHandler;
+    private readonly playerSize = 128;
+    keyH: KeyHandler = new KeyHandler;
 
     constructor (x: number, y: number, sprites: any) {
         super(x, y, false, 1, sprites);
-
         this.currentAnimation = this.down;
 
     }
@@ -21,7 +21,7 @@ export class Player extends Entity {
 
     override display(): void {
         let img = this.currentAnimation[this.currentFrame];
-        image(img, this.x, this.y);
+        image(img, this.x, this.y, this.playerSize, this.playerSize);
     }
     
 }
