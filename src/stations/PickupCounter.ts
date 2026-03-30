@@ -1,8 +1,6 @@
-import { Image } from 'p5';
+import { BaseStation } from "./BaseStation";
 
-interface SpriteData {
-    up: Image[];
-    down: Image[];
-    left: Image[];
-    right: Image[];
+export class PickupCounter extends BaseStation {
+
+
 }

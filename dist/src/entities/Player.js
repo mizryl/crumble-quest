@@ -15,7 +15,6 @@ export class Player extends Entity {
             this.currentAnimation = this.up;
             this.y -= this.speed;
             this.moving = true;
-            console.log("UP");
         }
         if (this.keyH.downPressed) {
             this.currentAnimation = this.down;
@@ -41,8 +40,6 @@ export class Player extends Entity {
         }
     }
     display() {
-        // let img = this.currentAnimation[this.currentFrame];
-        // image(img, this.x, this.y, 128,  256);
         let img = this.currentAnimation[this.currentFrame];
         // Calculate height based on the image's original proportions
         let displayWidth = this.tileSize;

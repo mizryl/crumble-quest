@@ -24,7 +24,6 @@ export class Player extends Entity {
             this.currentAnimation = this.up;
             this.y -= this.speed;
             this.moving = true;
-            console.log("UP");
         }
         
         if (this.keyH.downPressed) {
@@ -54,8 +53,6 @@ export class Player extends Entity {
     }
 
     override display(): void {
-        // let img = this.currentAnimation[this.currentFrame];
-        // image(img, this.x, this.y, 128,  256);
         let img = this.currentAnimation[this.currentFrame];
         
         // Calculate height based on the image's original proportions
