@@ -1,7 +1,9 @@
 import { Image } from "p5";
-import { TileManager } from "../world/TileManager";
+import { TileManager } from "../world/TileManager.js";
+import { Collidable } from "../Collidable.js";
+import { BaseStation } from "../stations/BaseStation.js";
 
-export abstract class Entity {
+export abstract class Entity implements Collidable {
     public up: Image[] = [];
     public down: Image[] = [];
     public left: Image[] = [];
@@ -9,7 +11,8 @@ export abstract class Entity {
     protected currentAnimation: Image[] = [];
     protected currentFrame: number = 0;
     protected spriteCounter: number = 0;
-    
+    isSolid: boolean = true;
+
     public x: number;
     public y: number;
     public speed: number;
@@ -31,8 +34,19 @@ export abstract class Entity {
         this.currentAnimation = this.down;
     }
 
-    abstract update(tileM: TileManager): void;
+    abstract update(tileM: TileManager, stations: BaseStation[]): void;
     abstract display(): void;
+
+    public getHitbox() {
+        const size = TileManager.TILE_SIZE;
+        return {
+            x: this.x * size,
+            y: this.y * size, 
+            w:  size,
+            h: size,
+        }
+        
+    }
     
    
 }

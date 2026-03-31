@@ -129,7 +129,7 @@ function drawGameWorld() {
         s.display();
     }
     if (player) {
-        player.update(tileM);
+        player.update(tileM, stations);
         player.display();
     }
     for (let s of frontStations) {

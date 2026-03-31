@@ -9,7 +9,7 @@ export class CheckoutCounter extends BaseStation {
 
 
     override interact(): void {
-
+        console.log("cash register");
     }
 
     override display() {

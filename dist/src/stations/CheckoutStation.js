@@ -5,6 +5,7 @@ export class CheckoutCounter extends BaseStation {
         super(x, y, sprites, false);
     }
     interact() {
+        console.log("cash register");
     }
     display() {
         const size = TileManager.TILE_SIZE;

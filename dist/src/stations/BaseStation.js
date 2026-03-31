@@ -1,8 +1,8 @@
 import { TileManager } from "../world/TileManager.js";
 export class BaseStation {
-    ;
     constructor(x, y, sprites, isOccupied) {
         this.isHighlighted = false;
+        this.isSolid = true;
         this.x = x;
         this.y = y;
         this.stationSprites = sprites;
@@ -12,7 +12,7 @@ export class BaseStation {
         const size = TileManager.TILE_SIZE;
         push();
         if (this.isHighlighted) {
-            tint(0, 200, 255);
+            tint(150, 150, 150);
         }
         else {
             noTint();
@@ -20,10 +20,23 @@ export class BaseStation {
         if (this.stationSprites) {
             image(this.stationSprites, this.x * size, this.y * size, size, size);
         }
+        pop();
     }
-    //highlights the station when the player is facing it
     setHighlight(visible) {
         this.isHighlighted = visible;
+    }
+    setBoundary(x, y) {
+        this.x = x;
+        this.y = y;
+    }
+    getHitbox() {
+        const size = TileManager.TILE_SIZE;
+        return {
+            x: this.x * size,
+            y: this.y * size,
+            w: size,
+            h: size
+        };
     }
 }
 //# sourceMappingURL=BaseStation.js.map

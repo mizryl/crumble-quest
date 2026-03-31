@@ -167,7 +167,7 @@ function drawGameWorld(): void {
   }
   
   if (player) {
-    player.update(tileM);
+    player.update(tileM, stations);
     player.display();
 
   }

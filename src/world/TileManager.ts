@@ -1,4 +1,5 @@
 import { Image } from "p5";
+import { Collidable } from "../Collidable.js";
 
 export class TileManager {
     public static readonly TILE_SIZE = 64;
@@ -32,18 +33,7 @@ export class TileManager {
         const tilesY = Math.ceil(height / TileManager.TILE_SIZE);
     
         for (let y = 0; y < tilesY; y++) {
-            // let mapY: number;
-
-            // if (y < 2) {
-            //     mapY = y;
-            // } else {
-            //     mapY = 2 + ((y-2) % (this.map.length - 2));
-            // }
             for (let x = 0; x < tilesX; x++) {
-                // The % operator wraps the index back to 0 when it hits the map limit
-                // const mapY = y % this.map.length;
-                // const mapX = x % this.map[mapY].length;
-                
                 const id = this.map[y][x];
                 if (this.tileImg[id]) {
                     image(this.tileImg[id], x * TileManager.TILE_SIZE, y * TileManager.TILE_SIZE, TileManager.TILE_SIZE, TileManager.TILE_SIZE);
