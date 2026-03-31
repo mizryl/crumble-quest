@@ -86,7 +86,7 @@ function setup(): void {
 
   //Game-related
   keyH = new KeyHandler();
-  player = new Player(tileM.worldWidth/2, tileM.worldHeight/2, playerSprites, keyH);
+  player = new Player(5, 2, playerSprites, keyH);
   console.log("Flour sprite status:", stationSprites['flour']);
   //stations
   stations.push(new Crates(1, 1.5, stationSprites['flour'], 'flour'));
@@ -167,7 +167,7 @@ function drawGameWorld(): void {
   }
   
   if (player) {
-    player.update();
+    player.update(tileM);
     player.display();
 
   }

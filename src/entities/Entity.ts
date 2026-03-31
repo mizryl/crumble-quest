@@ -1,4 +1,5 @@
 import { Image } from "p5";
+import { TileManager } from "../world/TileManager";
 
 export abstract class Entity {
     public up: Image[] = [];
@@ -30,7 +31,8 @@ export abstract class Entity {
         this.currentAnimation = this.down;
     }
 
-    abstract update(): void;
+    abstract update(tileM: TileManager): void;
     abstract display(): void;
-
+    
+   
 }
