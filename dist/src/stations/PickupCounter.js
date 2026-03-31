@@ -1,4 +1,5 @@
-import { BaseStation } from "./BaseStation";
-export class PickupCounter extends BaseStation {
-}
+"use strict";
+// import { BaseStation } from "./BaseStation";
+// export class PickupCounter extends BaseStation {
+// }
 //# sourceMappingURL=PickupCounter.js.map

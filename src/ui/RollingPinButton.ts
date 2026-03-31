@@ -5,7 +5,7 @@ export class RollingPinButton extends Button {
     private rot: number = 0;
     
     constructor(x: number, y: number, label: string) {
-        super(x, y, 600, 120, label )
+        super(x, y, 300, 60, label )
     }
 
     display(): void {
@@ -36,7 +36,7 @@ export class RollingPinButton extends Button {
 
         fill(255);
         textAlign(CENTER, CENTER);
-        textSize(60);
+        textSize(30);
         text(this.label, 0, 0);
         pop();
 

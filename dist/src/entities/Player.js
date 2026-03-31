@@ -1,8 +1,9 @@
 import { Entity } from './Entity.js';
+import { TileManager } from "../world/TileManager.js";
 export class Player extends Entity {
     constructor(x, y, sprites, keyH) {
         super(x, y, false, 4, sprites);
-        this.tileSize = 128;
+        this.tileSize = TileManager.TILE_SIZE;
         this.currentFrame = 0;
         this.moving = false;
         this.keyH = keyH;

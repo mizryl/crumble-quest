@@ -1,6 +1,5 @@
 export class TileManager {
     constructor() {
-        this.tileSize = 128;
         this.map = [];
         this.tileImg = [];
     }
@@ -22,8 +21,8 @@ export class TileManager {
         if (this.map.length === 0)
             return;
         // Calculate how many tiles fit on the current screen
-        const tilesX = Math.ceil(width / this.tileSize);
-        const tilesY = Math.ceil(height / this.tileSize);
+        const tilesX = Math.ceil(width / TileManager.TILE_SIZE);
+        const tilesY = Math.ceil(height / TileManager.TILE_SIZE);
         for (let y = 0; y < tilesY; y++) {
             let mapY;
             if (y < 2) {
@@ -38,7 +37,7 @@ export class TileManager {
                 const mapX = x % this.map[mapY].length;
                 const id = this.map[mapY][mapX];
                 if (this.tileImg[id]) {
-                    image(this.tileImg[id], x * this.tileSize, y * this.tileSize, this.tileSize, this.tileSize);
+                    image(this.tileImg[id], x * TileManager.TILE_SIZE, y * TileManager.TILE_SIZE, TileManager.TILE_SIZE, TileManager.TILE_SIZE);
                 }
             }
         }
@@ -52,5 +51,14 @@ export class TileManager {
             console.error("TileManager received empty map data!");
         }
     }
+    // The total width in pixels
+    get worldWidth() {
+        return this.map.length > 0 ? this.map[0].length * TileManager.TILE_SIZE : 0;
+    }
+    // The total height in pixels
+    get worldHeight() {
+        return this.map.length * TileManager.TILE_SIZE;
+    }
 }
+TileManager.TILE_SIZE = 64;
 //# sourceMappingURL=TileManager.js.map

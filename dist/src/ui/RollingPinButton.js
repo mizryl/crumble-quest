@@ -1,7 +1,7 @@
 import { Button } from './Button.js';
 export class RollingPinButton extends Button {
     constructor(x, y, label) {
-        super(x, y, 600, 120, label);
+        super(x, y, 300, 60, label);
         this.rot = 0;
     }
     display() {
@@ -25,7 +25,7 @@ export class RollingPinButton extends Button {
         rect(this.w / 2 + 30, 0, 60, 30);
         fill(255);
         textAlign(CENTER, CENTER);
-        textSize(60);
+        textSize(30);
         text(this.label, 0, 0);
         pop();
     }

@@ -1,10 +1,11 @@
 import { Image } from "p5";
 import { Entity } from './Entity.js';
-import { SpriteData } from "../interface.js";
+// import { SpriteData } from "../interface.js";
 import { KeyHandler } from "./KeyHandler.js";
+import { TileManager } from "../world/TileManager.js";
 
 export class Player extends Entity {
-    private readonly tileSize = 128;
+    private readonly tileSize = TileManager.TILE_SIZE;
     public keyH: KeyHandler;
     currentFrame: number = 0;
 
