@@ -31,8 +31,8 @@ export class RollingPinButton extends Button {
         rect(0, 0, this.w, this.h, 4);
 
         fill (186, 144, 100); //handle
-        rect(-this.w/2 - 30, 0, 60, 30);
-        rect(this.w/2 + 30, 0, 60, 30);
+        rect(-this.w/2 - 15, 0, 30, 15);
+        rect(this.w/2 + 15, 0, 30, 15);
 
         fill(255);
         textAlign(CENTER, CENTER);

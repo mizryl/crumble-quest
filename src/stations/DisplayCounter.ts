@@ -2,8 +2,9 @@ import { Image } from "p5";
 import { BaseStation } from "./BaseStation.js";
 import { TileManager } from "../world/TileManager.js";
 
-export class PickupCounter extends BaseStation {
+export class DisplayCounter extends BaseStation {
     constructor(x: number, y: number, sprites: Image) {
+
         super(x, y, sprites, false);
     }
 
@@ -11,22 +12,12 @@ export class PickupCounter extends BaseStation {
 
     }
 
+
     override display(): void {
         const size = TileManager.TILE_SIZE;
 
-        push();
-        if  (this.isHighlighted) {
-            tint(0, 200, 225);
-        } else {
-            noTint();
-        }
-
         if (this.stationSprites) {
-            image(this.stationSprites, this.x * size, this.y * size, size *2, size);
+            image(this.stationSprites, this.x * size, this.y * size, size * 2, size*2);
         }
-
     }
-
-
-
 }

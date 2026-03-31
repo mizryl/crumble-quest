@@ -4,19 +4,26 @@ import { Player } from './src/entities/Player.js';
 import { KeyHandler } from './src/entities/KeyHandler.js';
 import { Crates } from './src/stations/Crates.js';
 import { Oven } from './src/stations/Oven.js';
+import { PrepTable } from './src/stations/PrepTable.js';
+import { PickupCounter } from './src/stations/PickupCounter.js';
+import { DisplayCounter } from './src/stations/DisplayCounter.js';
+import { CheckoutCounter } from './src/stations/CheckoutStation.js';
+//start screen 
 let startBtn;
 let loadBtn;
-//sprites related
+let font;
+let cloudImg;
+//sprites-related
 let tileM = new TileManager();
 let mapData;
 let playerSprites = { up: [], down: [], left: [], right: [] };
 let stations = [];
+let frontStations = [];
 let stationSprites = {};
+//game-related
 let player;
 let keyH;
 let gameState;
-let font;
-let cloudImg;
 let dayCount = 0;
 function preload() {
     //tiles
@@ -33,12 +40,19 @@ function preload() {
     }
     //stations
     stationSprites['flour'] = loadImage('assets/img/flour.png');
+    stationSprites['eggs'] = loadImage('assets/img/eggs.png');
+    stationSprites['fruit'] = loadImage('assets/img/fruit.png');
     stationSprites['oven'] = loadImage('assets/img/oven.png');
     stationSprites['prep'] = loadImage('assets/img/prep-table.png');
+    stationSprites['pickup'] = loadImage('assets/img/counter.png');
+    stationSprites['display'] = loadImage('assets/img/display.png');
+    stationSprites['checkout'] = loadImage('assets/img/counter.png');
 }
 function setup() {
     noSmooth();
-    pixelDensity(1);
+    // const cnv = createCanvas(tileM.worldWidth, tileM.worldHeight);
+    // // Force the CSS of the canvas to stay crisp
+    // cnv.elt.style.imageRendering = 'pixelated';
     console.log("Setup is running!");
     tileM.parseLoadedMap(mapData);
     createCanvas(tileM.worldWidth, tileM.worldHeight);
@@ -55,7 +69,20 @@ function setup() {
     console.log("Flour sprite status:", stationSprites['flour']);
     //stations
     stations.push(new Crates(1, 1.5, stationSprites['flour'], 'flour'));
+    stations.push(new Crates(2, 1.5, stationSprites['eggs'], 'egg'));
+    stations.push(new Crates(3, 1.5, stationSprites['fruit'], 'fruit'));
     stations.push(new Oven(8, 1.5, stationSprites['oven']));
+    stations.push(new Oven(10, 1.5, stationSprites['oven']));
+    stations.push(new PrepTable(5, 1.5, stationSprites['prep']));
+    stations.push(new PrepTable(6, 1.5, stationSprites['prep']));
+    frontStations.push(new PickupCounter(8, 4.5, stationSprites['pickup']));
+    frontStations.push(new PickupCounter(10, 4.5, stationSprites['pickup']));
+    frontStations.push(new PickupCounter(12, 4.5, stationSprites['pickup']));
+    frontStations.push(new PickupCounter(14, 4.5, stationSprites['pickup']));
+    frontStations.push(new DisplayCounter(0, 3.5, stationSprites['display']));
+    frontStations.push(new DisplayCounter(2, 3.5, stationSprites['display']));
+    frontStations.push(new DisplayCounter(6, 3.5, stationSprites['display']));
+    frontStations.push(new CheckoutCounter(4, 4.5, stationSprites['checkout']));
 }
 function draw() {
     background(235, 226, 214);
@@ -104,6 +131,9 @@ function drawGameWorld() {
     if (player) {
         player.update();
         player.display();
+    }
+    for (let s of frontStations) {
+        s.display();
     }
 }
 function drawResults() {

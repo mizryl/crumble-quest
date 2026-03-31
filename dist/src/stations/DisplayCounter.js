@@ -1,6 +1,6 @@
 import { BaseStation } from "./BaseStation.js";
 import { TileManager } from "../world/TileManager.js";
-export class PickupCounter extends BaseStation {
+export class DisplayCounter extends BaseStation {
     constructor(x, y, sprites) {
         super(x, y, sprites, false);
     }
@@ -8,16 +8,9 @@ export class PickupCounter extends BaseStation {
     }
     display() {
         const size = TileManager.TILE_SIZE;
-        push();
-        if (this.isHighlighted) {
-            tint(0, 200, 225);
-        }
-        else {
-            noTint();
-        }
         if (this.stationSprites) {
-            image(this.stationSprites, this.x * size, this.y * size, size * 2, size);
+            image(this.stationSprites, this.x * size, this.y * size, size * 2, size * 2);
         }
     }
 }
-//# sourceMappingURL=PickupCounter.js.map
+//# sourceMappingURL=DisplayCounter.js.map
