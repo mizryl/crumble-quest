@@ -52,9 +52,6 @@ function preload() {
 }
 function setup() {
     noSmooth();
-    // const cnv = createCanvas(tileM.worldWidth, tileM.worldHeight);
-    // // Force the CSS of the canvas to stay crisp
-    // cnv.elt.style.imageRendering = 'pixelated';
     console.log("Setup is running!");
     tileM.parseLoadedMap(mapData);
     createCanvas(tileM.worldWidth, tileM.worldHeight);
