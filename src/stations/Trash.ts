@@ -10,8 +10,9 @@ export class Trash extends BaseStation {
     override interact(player: Player): void {
         if (player.inventoryFull) {
             player.inventoryFull = false;
+            console.log("trashed item: " + player.itemGrabbed);
             player.itemGrabbed = '';
-            console.log("trashed item");
+            
         }
     }
 }

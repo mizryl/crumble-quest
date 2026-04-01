@@ -5,7 +5,7 @@ export class Player extends Entity {
         super(x, y, false, 0.05, sprites);
         this.tileSize = TileManager.TILE_SIZE;
         this.currentFrame = 0;
-        this.debugMode = true;
+        this.debugMode = false;
         this.moving = false;
         this.inventoryFull = false;
         this.itemGrabbed = '';
@@ -80,12 +80,12 @@ export class Player extends Entity {
             noFill();
             stroke(0, 0, 255);
             strokeWeight(2);
+            for (let s of stations) {
+                let hb = s.getHitbox();
+                rect(hb.x, hb.y, hb.w, hb.h);
+            }
+            pop();
         }
-        for (let s of stations) {
-            let hb = s.getHitbox();
-            rect(hb.x, hb.y, hb.w, hb.h);
-        }
-        pop();
         this.checkStationProximity(stations);
     }
     display() {

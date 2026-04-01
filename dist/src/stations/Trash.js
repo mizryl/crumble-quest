@@ -6,8 +6,8 @@ export class Trash extends BaseStation {
     interact(player) {
         if (player.inventoryFull) {
             player.inventoryFull = false;
+            console.log("trashed item: " + player.itemGrabbed);
             player.itemGrabbed = '';
-            console.log("trashed item");
         }
     }
 }

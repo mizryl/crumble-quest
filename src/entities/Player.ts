@@ -9,7 +9,7 @@ export class Player extends Entity {
     private readonly tileSize = TileManager.TILE_SIZE;
     public keyH: KeyHandler;
     currentFrame: number = 0;
-    debugMode = true;
+    debugMode = false;
     public moving: boolean = false;
 
     inventoryFull: boolean = false;
@@ -99,14 +99,16 @@ export class Player extends Entity {
             noFill();
             stroke(0, 0, 255);
             strokeWeight(2);
+
+            for (let s of stations) {
+                let hb = s.getHitbox();
+                rect(hb.x, hb.y, hb.w, hb.h);
+            }
+            pop();
         }
         
         
-        for (let s of stations) {
-            let hb = s.getHitbox();
-            rect(hb.x, hb.y, hb.w, hb.h);
-        }
-        pop();
+        
 
         this.checkStationProximity(stations);
 
