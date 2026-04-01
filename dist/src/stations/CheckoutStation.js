@@ -2,15 +2,16 @@ import { BaseStation } from "./BaseStation.js";
 import { TileManager } from "../world/TileManager.js";
 export class CheckoutCounter extends BaseStation {
     constructor(x, y, sprites) {
-        super(x, y, sprites, false);
+        super(x, y, sprites, false, "checkout", false, true);
     }
     interact() {
         console.log("cash register");
     }
     display() {
         const size = TileManager.TILE_SIZE;
+        push();
         if (this.isHighlighted) {
-            tint(0, 200, 225);
+            tint(150, 150, 150);
         }
         else {
             noTint();
@@ -32,6 +33,16 @@ export class CheckoutCounter extends BaseStation {
             pop();
             pop();
         }
+        pop();
+    }
+    getHitbox(checkX = this.x, checkY = this.y) {
+        const size = TileManager.TILE_SIZE;
+        return {
+            x: checkX * size,
+            y: (checkY * size) - (size * 0.25),
+            w: size * 2, // Correct: 2 tiles wide
+            h: size
+        };
     }
 }
 //# sourceMappingURL=CheckoutStation.js.map

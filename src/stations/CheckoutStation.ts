@@ -4,7 +4,8 @@ import { TileManager } from "../world/TileManager.js";
 
 export class CheckoutCounter extends BaseStation {
     constructor(x: number, y: number, sprites: Image) {
-        super(x, y, sprites, false);
+        super(x, y, sprites, false, "checkout", false, true);
+
     }
 
 
@@ -16,9 +17,9 @@ export class CheckoutCounter extends BaseStation {
         const size = TileManager.TILE_SIZE;
         
 
+        push();
         if (this.isHighlighted) {
-
-            tint(0, 200, 225);
+            tint(150, 150, 150);
         } else {
             noTint();
         }
@@ -41,7 +42,16 @@ export class CheckoutCounter extends BaseStation {
             
             pop();
         }
-
-
+        pop();
     }
+    public override getHitbox(checkX: number = this.x, checkY: number = this.y) {
+        const size = TileManager.TILE_SIZE;
+        return {
+            x: checkX * size,
+            y: (checkY * size) - (size * 0.25), 
+            w: size * 2, // Correct: 2 tiles wide
+            h: size 
+        };
+    }
+    
 }

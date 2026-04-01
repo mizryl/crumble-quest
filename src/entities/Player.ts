@@ -9,8 +9,12 @@ export class Player extends Entity {
     private readonly tileSize = TileManager.TILE_SIZE;
     public keyH: KeyHandler;
     currentFrame: number = 0;
-
+    debugMode = true;
     public moving: boolean = false;
+
+    inventoryFull: boolean = false;
+    itemGrabbed: string = '';
+    
 
     constructor (x: number, y: number, sprites: any, keyH: KeyHandler) {
         super(x, y, false, 0.05, sprites);
@@ -19,25 +23,28 @@ export class Player extends Entity {
     }
 
     override update(tileM: TileManager, stations: BaseStation[]): void {
+        let nextX = this.x;
+        let nextY = this.y;
+
         this.moving = this.keyH.upPressed || this.keyH.downPressed ||
                                 this.keyH.leftPressed || this.keyH.rightPressed;
 
         if (this.keyH.upPressed) {
             this.currentAnimation = this.up;
-            this.y -= this.speed;
+            nextY -= this.speed;
         }
         
         if (this.keyH.downPressed) {
             this.currentAnimation = this.down;
-            this.y += this.speed;
+            nextY += this.speed;
         }
         if (this.keyH.leftPressed) {
             this.currentAnimation = this.left;
-            this.x -= this.speed;
+            nextX -= this.speed;
         }
         if (this.keyH.rightPressed) {
             this.currentAnimation = this.right;
-            this.x += this.speed;
+            nextX += this.speed;
         }
 
         if (!this.moving) {
@@ -50,11 +57,59 @@ export class Player extends Entity {
             }
         }
 
-        this.x = constrain(this.x, 0, 14);
-        this.y = constrain(this.y, 0.1, 3);
+        //boundaries
+        nextX = constrain(nextX, 0, (tileM.worldWidth / this.tileSize) - 1);
+        nextY = constrain(nextY, 0.1, (tileM.worldHeight / this.tileSize) - 7);
+
+        //collision 
+        let collision = false;
+        const playerHB = this.getHitbox(nextX, nextY);
+        for (const s of stations) {
+            // if (s.id === 'display' || s.id === 'checkout' || s.id === 'pickup') continue;
+            if (!s.isSolid) continue;
+
+            const stationHB = s.getHitbox();
+
+
+            if (playerHB.x < stationHB.x + stationHB.w &&
+                playerHB.x + playerHB.w > stationHB.x &&
+                playerHB.y < stationHB.y + stationHB.h &&
+                playerHB.y + playerHB.h > stationHB.y) {
+                    collision = true;
+                    break;
+
+            }
+            //debugging player's hitbox
+            if (this.debugMode) {
+                push();
+                noFill();
+                stroke(0, 255, 0);
+                strokeWeight(1);
+                rect(playerHB.x, playerHB.y, playerHB.w, playerHB.h);
+                pop();
+            }
+        }
+        if (!collision) {
+            this.x = nextX;
+            this.y = nextY;
+        }
+
+        if (this.debugMode) {
+            push();
+            noFill();
+            stroke(0, 0, 255);
+            strokeWeight(2);
+        }
+        
+        
+        for (let s of stations) {
+            let hb = s.getHitbox();
+            rect(hb.x, hb.y, hb.w, hb.h);
+        }
+        pop();
 
         this.checkStationProximity(stations);
- 
+
     }
 
     override display(): void {
@@ -111,10 +166,19 @@ export class Player extends Entity {
     if (targetStation) {
         targetStation.setHighlight(true);
         if (this.keyH.interactPressed) {
-            targetStation.interact();
+            targetStation.interact(this);
             this.keyH.interactPressed = false;
         }
     }
+    if (this.debugMode) {
+        push();
+        noFill();
+        stroke(255, 0, 0);
+        strokeWeight(2);
+        rect(sensor.x, sensor.y, sensor.w, sensor.h);
+        pop();
+    }
+    
 }
     
 }

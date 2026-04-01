@@ -4,7 +4,10 @@ import { TileManager } from "../world/TileManager.js";
 
 export class PickupCounter extends BaseStation {
     constructor(x: number, y: number, sprites: Image) {
-        super(x, y, sprites, false);
+        super(x, y, sprites, false, "pickup", false, true);
+        // this.isInteractive = true;
+        // this.isSolid = false;
+    
     }
 
     override interact() {
@@ -16,7 +19,7 @@ export class PickupCounter extends BaseStation {
 
         push();
         if  (this.isHighlighted) {
-            tint(0, 200, 225);
+            tint(150, 150, 150);
         } else {
             noTint();
         }
@@ -25,8 +28,18 @@ export class PickupCounter extends BaseStation {
             image(this.stationSprites, this.x * size, this.y * size, size *2, size);
         }
 
+        pop();
+
     }
 
-
+    public override getHitbox(checkX: number = this.x, checkY: number = this.y) {
+        const size = TileManager.TILE_SIZE;
+        return {
+            x: checkX * size,
+            y: (checkY * size) - (size * 0.25),
+            w: size * 2, // Matches the size * 2 in display()
+            h: size * 1.2
+        };
+    }
 
 }

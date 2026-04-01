@@ -16,9 +16,6 @@ export abstract class Entity implements Collidable {
     public x: number;
     public y: number;
     public speed: number;
-    // public moving: boolean;
-    // public speed: number;
-
 
     constructor(x: number, y: number, moving:boolean, speed: number,
                 sprites: any) {
@@ -29,21 +26,23 @@ export abstract class Entity implements Collidable {
         this.x = x;
         this.y = y;
         this.speed = speed;
-        // this.moving = moving;
-        // this.speed = speed;
         this.currentAnimation = this.down;
     }
 
     abstract update(tileM: TileManager, stations: BaseStation[]): void;
     abstract display(): void;
 
-    public getHitbox() {
+    public getHitbox(checkX: number = this.x, checkY: number = this.y) {
         const size = TileManager.TILE_SIZE;
+        // const padding = size * 0.1;
+        const widthScale = 0.7;
+        const hBoxW = size * widthScale;
+        const xOffset = (size - hBoxW) / 2;
         return {
-            x: this.x * size,
-            y: this.y * size, 
-            w:  size,
-            h: size,
+            x: (checkX * size) + xOffset,
+            y: (checkY * size) + 110, 
+            w:  hBoxW,
+            h: size /2,
         }
         
     }

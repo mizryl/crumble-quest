@@ -4,17 +4,18 @@ export abstract class ProcessingStation extends BaseStation {
 
     public processingTime: number = 5;
     public currentProgress: number = 0;
-    public isFinsihed: boolean = false;
+    public isFinished: boolean = false;
     protected isProcessing: boolean = false;
 
-    constructor(x: number, y: number, sprites: any, isOccupied: boolean) {
-        super(x, y, sprites, isOccupied)
+    constructor(x: number, y: number, sprites: any, isOccupied: boolean, id: string,
+                isSolid: boolean, isInteractive: boolean) {
+        super(x, y, sprites, isOccupied, id, isSolid, isInteractive);
     }
 
     abstract startProcessing(): void;
     
     protected updateProgress(dt: number): void {
-        if (!this.isProcessing || this.isFinsihed) return;
+        if (!this.isProcessing || this.isFinished) return;
 
         this.currentProgress += dt;
 
@@ -24,7 +25,7 @@ export abstract class ProcessingStation extends BaseStation {
     }
 
     private finishProcessing(): void {
-        this.isFinsihed = true;
+        this.isFinished = true;
         this.isProcessing = false;
         this.currentProgress = this.processingTime;
         console.log("Processing Complete");    

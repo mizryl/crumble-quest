@@ -1,6 +1,7 @@
 import { Image } from "p5";
 import { TileManager } from "../world/TileManager.js";
 import { Collidable } from "../Collidable.js";
+import { Player } from "../entities/Player.js";
 
 
 export abstract class BaseStation implements Collidable{
@@ -9,16 +10,23 @@ export abstract class BaseStation implements Collidable{
     y: number;
     isOccupied: boolean;
     isHighlighted: boolean = false;
-    isSolid: boolean = true;
+    isSolid: boolean;
+    isInteractive: boolean;
+    id: string;
 
-    constructor(x: number, y: number, sprites: Image, isOccupied: boolean) {
+    constructor(x: number, y: number, sprites: Image, isOccupied: boolean, id: string,
+                isSolid: boolean, isInteractive: boolean) {
         this.x = x;
         this.y = y;
         this.stationSprites = sprites;
         this.isOccupied = isOccupied;
+        this.id = id;
+        this.isSolid = isSolid;
+        this.isInteractive = isInteractive;
+
     }
 
-    abstract interact(): void;
+    abstract interact(player: Player): void;
 
     public display(): void {
         const size = TileManager.TILE_SIZE
@@ -37,6 +45,12 @@ export abstract class BaseStation implements Collidable{
     }
     
     public setHighlight(visible: boolean): void {
+
+        if (!this.isInteractive) {
+            this.isHighlighted = false;
+            return;
+        }
+
         this.isHighlighted = visible;
     }
 
@@ -45,13 +59,15 @@ export abstract class BaseStation implements Collidable{
         this.y = y;
     }
 
-      public getHitbox() {
+      public getHitbox(checkX: number = this.x, checkY: number = this.y) {
         const size = TileManager.TILE_SIZE;
+        const hitboxHeight = size ;
+        const yOffset = size * 0.01;
         return {
-            x: this.x * size,
-            y: this.y * size,
+            x: checkX * size,
+            y: (checkY * size) + yOffset,
             w: size,
-            h: size
+            h: hitboxHeight
         }
     }
 

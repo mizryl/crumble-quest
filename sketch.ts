@@ -12,6 +12,7 @@ import { PrepTable } from './src/stations/PrepTable.js';
 import { PickupCounter } from './src/stations/PickupCounter.js';
 import { DisplayCounter } from './src/stations/DisplayCounter.js';
 import { CheckoutCounter } from './src/stations/CheckoutStation.js';
+import { Trash } from './src/stations/Trash.js';
 
 //start screen 
 let startBtn: RollingPinButton;
@@ -60,6 +61,8 @@ function preload(): void {
   stationSprites['pickup'] = loadImage('assets/img/counter.png');
   stationSprites['display'] = loadImage('assets/img/display.png');
   stationSprites['checkout'] = loadImage('assets/img/counter.png');
+  stationSprites['trash'] = loadImage('assets/img/trash.png');
+
 
 
 }
@@ -89,13 +92,14 @@ function setup(): void {
   player = new Player(5, 2, playerSprites, keyH);
   console.log("Flour sprite status:", stationSprites['flour']);
   //stations
-  stations.push(new Crates(1, 1.5, stationSprites['flour'], 'flour'));
-  stations.push(new Crates(2, 1.5, stationSprites['eggs'], 'egg'));
-  stations.push(new Crates(3, 1.5, stationSprites['fruit'], 'fruit'));
-  stations.push(new Oven(8, 1.5, stationSprites['oven']));
+  stations.push(new Crates(3, 1.5, stationSprites['flour'], 'flour'));
+  stations.push(new Crates(4, 1.5, stationSprites['eggs'], 'egg'));
+  stations.push(new Crates(5, 1.5, stationSprites['fruit'], 'fruit'));
   stations.push(new Oven(10, 1.5, stationSprites['oven']));
-  stations.push(new PrepTable(5, 1.5, stationSprites['prep']));
-  stations.push(new PrepTable(6, 1.5, stationSprites['prep']));
+  stations.push(new Oven(12, 1.5, stationSprites['oven']));
+  stations.push(new PrepTable(7, 1.5, stationSprites['prep']));
+  stations.push(new PrepTable(8, 1.5, stationSprites['prep']));
+  stations.push(new Trash(1, 1.5, stationSprites['trash']));
   frontStations.push(new PickupCounter(8, 4.5, stationSprites['pickup']));
   frontStations.push(new PickupCounter(10, 4.5, stationSprites['pickup']));
   frontStations.push(new PickupCounter(12, 4.5, stationSprites['pickup']));
@@ -157,6 +161,9 @@ function drawMainMenu(): void {
 
 function drawGameWorld(): void {
   background(235, 226, 214);
+
+  const allStations = [...stations, ...frontStations];
+
   tileM.display();
   text("test", tileM.worldWidth/2, tileM.worldHeight/2);
   
@@ -167,7 +174,7 @@ function drawGameWorld(): void {
   }
   
   if (player) {
-    player.update(tileM, stations);
+    player.update(tileM, allStations);
     player.display();
 
   }
@@ -175,6 +182,7 @@ function drawGameWorld(): void {
   for (let s of frontStations) {
     s.display();
   }
+  
 
 }
 

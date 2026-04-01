@@ -1,7 +1,5 @@
 import { TileManager } from "../world/TileManager.js";
 export class Entity {
-    // public moving: boolean;
-    // public speed: number;
     constructor(x, y, moving, speed, sprites) {
         this.up = [];
         this.down = [];
@@ -18,17 +16,19 @@ export class Entity {
         this.x = x;
         this.y = y;
         this.speed = speed;
-        // this.moving = moving;
-        // this.speed = speed;
         this.currentAnimation = this.down;
     }
-    getHitbox() {
+    getHitbox(checkX = this.x, checkY = this.y) {
         const size = TileManager.TILE_SIZE;
+        // const padding = size * 0.1;
+        const widthScale = 0.7;
+        const hBoxW = size * widthScale;
+        const xOffset = (size - hBoxW) / 2;
         return {
-            x: this.x * size,
-            y: this.y * size,
-            w: size,
-            h: size,
+            x: (checkX * size) + xOffset,
+            y: (checkY * size) + 110,
+            w: hBoxW,
+            h: size / 2,
         };
     }
 }
