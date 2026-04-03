@@ -5,6 +5,7 @@ export class KeyHandler {
     public leftPressed: boolean = false;
     public rightPressed: boolean = false;
     public interactPressed: boolean = false;
+    public processPressed: boolean = false;
 
     handlePressed(k: string): void {
         let keyLower = k.toLowerCase();
@@ -13,6 +14,7 @@ export class KeyHandler {
         if (keyLower === 'a') this.leftPressed = true;
         if (keyLower === 'd') this.rightPressed = true;
         if (keyLower === 'e' || k === ' ') this.interactPressed = true;
+        if (keyLower === 'f') this.processPressed = true;
         
     }
 
@@ -23,15 +25,17 @@ export class KeyHandler {
         if (keyLower === 'a') this.leftPressed = false;
         if (keyLower === 'd') this.rightPressed = false;
         if (keyLower === 'e' || k === ' ') this.interactPressed = false;
+        if (keyLower === 'f') this.processPressed = false;
     }
 
-    public consumeInteract(): boolean {
-        if (this.interactPressed) {
-            this.interactPressed = false;
-            return true; //tells the game the player has interacted
-        }
-        return false; //tell the game, nothing to do here
-    }
+    // public consumeInteract(): boolean {
+    //     if (this.interactPressed) {
+    //         this.interactPressed = false;
+    //         return true; //tells the game the player has interacted
+    //     }
+    //     return false; //tell the game, nothing to do here
+    // }
+    
 
 
 }

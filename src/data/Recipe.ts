@@ -1,6 +1,7 @@
 export interface RecipeStep {
-    action: 'ADD' | 'BAKE' | 'PREP';
+    action: 'ADD' | 'BAKE' | 'PREP' | 'FRY';
     item: string;
+    output: string;
 }
 
 export interface Recipe {

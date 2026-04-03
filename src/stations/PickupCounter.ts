@@ -5,8 +5,6 @@ import { TileManager } from "../world/TileManager.js";
 export class PickupCounter extends BaseStation {
     constructor(x: number, y: number, sprites: Image) {
         super(x, y, sprites, false, "pickup", false, true);
-        // this.isInteractive = true;
-        // this.isSolid = false;
     
     }
 

@@ -5,6 +5,14 @@ export class KeyHandler {
         this.leftPressed = false;
         this.rightPressed = false;
         this.interactPressed = false;
+        this.processPressed = false;
+        // public consumeInteract(): boolean {
+        //     if (this.interactPressed) {
+        //         this.interactPressed = false;
+        //         return true; //tells the game the player has interacted
+        //     }
+        //     return false; //tell the game, nothing to do here
+        // }
     }
     handlePressed(k) {
         let keyLower = k.toLowerCase();
@@ -18,6 +26,8 @@ export class KeyHandler {
             this.rightPressed = true;
         if (keyLower === 'e' || k === ' ')
             this.interactPressed = true;
+        if (keyLower === 'f')
+            this.processPressed = true;
     }
     handleReleased(k) {
         let keyLower = k.toLowerCase();
@@ -31,13 +41,8 @@ export class KeyHandler {
             this.rightPressed = false;
         if (keyLower === 'e' || k === ' ')
             this.interactPressed = false;
-    }
-    consumeInteract() {
-        if (this.interactPressed) {
-            this.interactPressed = false;
-            return true; //tells the game the player has interacted
-        }
-        return false; //tell the game, nothing to do here
+        if (keyLower === 'f')
+            this.processPressed = false;
     }
 }
 //# sourceMappingURL=KeyHandler.js.map

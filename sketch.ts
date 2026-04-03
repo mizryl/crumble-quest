@@ -13,6 +13,8 @@ import { PickupCounter } from './src/stations/PickupCounter.js';
 import { DisplayCounter } from './src/stations/DisplayCounter.js';
 import { CheckoutCounter } from './src/stations/CheckoutStation.js';
 import { Trash } from './src/stations/Trash.js';
+import { RecipeManager } from './src/data/RecipeManager.js';
+import { Recipe } from './src/data/Recipe.js';
 
 //start screen 
 let startBtn: RollingPinButton;
@@ -32,6 +34,7 @@ let stationSprites: { [key: string]: Image } = {};
 //game-related
 let player: Player;
 let keyH: KeyHandler;
+let recipeManager: RecipeManager;
 
 let gameState: "START" | "PLAYING" | "RESULTS";
 
@@ -86,15 +89,18 @@ function setup(): void {
   //Game-related
   keyH = new KeyHandler();
   player = new Player(5, 2, playerSprites, keyH);
-  console.log("Flour sprite status:", stationSprites['flour']);
+  recipeManager = new RecipeManager();
+
+
+  // console.log("Flour sprite status:", stationSprites['flour']);
   //stations
   stations.push(new Crates(3, 1.5, stationSprites['flour'], 'flour'));
   stations.push(new Crates(4, 1.5, stationSprites['eggs'], 'egg'));
   stations.push(new Crates(5, 1.5, stationSprites['fruit'], 'fruit'));
-  stations.push(new Oven(10, 1.5, stationSprites['oven']));
-  stations.push(new Oven(12, 1.5, stationSprites['oven']));
-  stations.push(new PrepTable(7, 1.5, stationSprites['prep']));
-  stations.push(new PrepTable(8, 1.5, stationSprites['prep']));
+  stations.push(new Oven(10, 1.5, stationSprites['oven'], recipeManager, 1));
+  stations.push(new Oven(12, 1.5, stationSprites['oven'], recipeManager, 1));
+  stations.push(new PrepTable(7, 1.5, stationSprites['prep'], recipeManager, 2));
+  stations.push(new PrepTable(8, 1.5, stationSprites['prep'], recipeManager, 2));
   stations.push(new Trash(1, 1.5, stationSprites['trash']));
   frontStations.push(new PickupCounter(8, 4.5, stationSprites['pickup']));
   frontStations.push(new PickupCounter(10, 4.5, stationSprites['pickup']));
@@ -158,6 +164,7 @@ function drawMainMenu(): void {
 function drawGameWorld(): void {
   background(235, 226, 214);
 
+  const dt = deltaTime / 1000;
   const allStations = [...stations, ...frontStations];
 
   tileM.display();
@@ -165,8 +172,12 @@ function drawGameWorld(): void {
   
   
   for (let s of stations) {
- 
     s.display();
+    
+    if (s instanceof Oven) {
+      s.update(dt);
+    }
+
   }
   
   if (player) {

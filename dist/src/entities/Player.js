@@ -1,5 +1,7 @@
 import { Entity } from './Entity.js';
 import { TileManager } from "../world/TileManager.js";
+import { ProcessingStation } from "../stations/ProcessingStation.js";
+import { Oven } from "../stations/Oven.js";
 export class Player extends Entity {
     constructor(x, y, sprites, keyH) {
         super(x, y, false, 0.05, sprites);
@@ -7,8 +9,8 @@ export class Player extends Entity {
         this.currentFrame = 0;
         this.debugMode = false;
         this.moving = false;
-        this.inventoryFull = false;
-        this.itemGrabbed = '';
+        // inventoryFull: boolean = false;
+        this.heldItem = null;
         this.keyH = keyH;
         this.currentAnimation = this.down;
     }
@@ -133,9 +135,25 @@ export class Player extends Entity {
         }
         if (targetStation) {
             targetStation.setHighlight(true);
+            //single click (deposit/pickup)
             if (this.keyH.interactPressed) {
                 targetStation.interact(this);
                 this.keyH.interactPressed = false;
+            }
+            //continuous hold
+            if (targetStation instanceof ProcessingStation) {
+                // Check if this is a station that REQUIRES manual labor
+                const isManualStation = !(targetStation instanceof Oven);
+                if (this.keyH.processPressed && !this.heldItem && isManualStation) {
+                    // Only call work if the player is holding the key AND it's manual
+                    targetStation.work(deltaTime / 1000);
+                }
+                else if (isManualStation) {
+                    // If it's a manual station and the key ISN'T pressed, stop it
+                    targetStation.stopProcessing();
+                }
+                // Note: We don't call anything for Oven here because the 
+                // Oven's own update() method handles its progress!
             }
         }
         if (this.debugMode) {

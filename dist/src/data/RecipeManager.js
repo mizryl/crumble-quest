@@ -1,4 +1,4 @@
-class RecipeManager {
+export class RecipeManager {
     constructor() {
         this.recipes = new Map();
         this.loadRecipes();
@@ -9,23 +9,21 @@ class RecipeManager {
             title: 'Sponge Cake',
             ingredients: ['flour', 'egg'],
             steps: [
-                { action: 'PREP', item: 'flour' },
-                { action: 'ADD', item: 'egg' },
-                { action: 'BAKE', item: 'batter' },
+                { action: 'PREP', item: 'flour+egg', output: 'flour' },
+                { action: 'BAKE', item: 'batter', output: 'sponge-cake' },
             ],
             bakeTime: 5,
             value: 50,
-            spriteKey: 'cake'
+            spriteKey: 'sponge-cake'
         });
         this.addRecipe({
             id: 'fruit-cake',
             title: 'Strawberry Cake',
             ingredients: ['flour', 'egg', 'fruit'],
             steps: [
-                { action: 'PREP', item: 'flour' },
-                { action: 'ADD', item: 'egg' },
-                { action: 'BAKE', item: 'batter' },
-                { action: 'ADD', item: 'fruit' }
+                { action: 'PREP', item: 'flour+egg', output: 'batter' },
+                { action: 'BAKE', item: 'batter', output: 'sponge-cake' },
+                { action: 'ADD', item: 'chopped-fruit', output: 'fruit-cake' }
             ],
             bakeTime: 5,
             value: 50,
@@ -36,8 +34,8 @@ class RecipeManager {
             title: 'Bread',
             ingredients: ['flour'],
             steps: [
-                { action: 'PREP', item: 'flour' },
-                { action: 'BAKE', item: 'dough' }
+                { action: 'PREP', item: 'flour', output: 'dough' },
+                { action: 'BAKE', item: 'dough', output: 'bread' }
             ],
             bakeTime: 5,
             value: 15,
@@ -48,10 +46,10 @@ class RecipeManager {
             title: 'Egg Toast',
             ingredients: ['flour', 'egg'],
             steps: [
-                { action: 'PREP', item: 'flour' },
-                { action: 'BAKE', item: 'dough' },
-                { action: 'PREP', item: 'egg' },
-                { action: 'ADD', item: 'egg' }
+                { action: 'PREP', item: 'flour', output: 'dough' },
+                { action: 'BAKE', item: 'dough', output: 'bread' },
+                { action: 'FRY', item: 'egg', output: 'fried-egg' },
+                { action: 'ADD', item: 'fried-egg', output: 'egg-toast' }
             ],
             bakeTime: 5,
             value: 35,
@@ -62,13 +60,14 @@ class RecipeManager {
             title: 'Jam Toast',
             ingredients: ['flour', 'fruit'],
             steps: [
-                { action: 'PREP', item: 'flour' },
-                { action: 'BAKE', item: 'dough' },
-                { action: 'PREP', item: 'fruit' },
-                { action: 'ADD', item: 'fruit' }
+                { action: 'PREP', item: 'flour', output: 'dough' },
+                { action: 'BAKE', item: 'dough', output: 'bread' },
+                { action: 'PREP', item: 'fruit', output: 'chopped-fruit' },
+                { action: 'FRY', item: 'chopped-fruit', output: 'jam' },
+                { action: 'ADD', item: 'jam', output: 'jam-toast' }
             ],
             bakeTime: 5,
-            value: 15,
+            value: 30,
             spriteKey: 'jam-toast'
         });
     }
@@ -85,6 +84,67 @@ class RecipeManager {
     getAllRecipes() {
         return Array.from(this.recipes.values());
     }
+    getPrepResult(ingredients) {
+        const sortedInput = [...ingredients].sort().join(',');
+        //single item
+        if (ingredients.length === 1) {
+            const item = ingredients[0];
+            if (item === 'flour')
+                return 'dough';
+            if (item === 'fruit')
+                return 'chopped-fruit';
+            return item;
+        }
+        //multi-item
+        if (ingredients.length === 2) {
+            if (sortedInput === 'egg,flour')
+                return 'batter';
+        }
+        //jam toast assemble
+        if (sortedInput === 'bread,jam')
+            return 'jam-toast';
+        if (sortedInput === 'bread,fried-egg')
+            return 'egg-toast';
+        if (sortedInput === 'sponge-cake,chopped-fruit')
+            return 'fruit-cake';
+        return 'ruined-food';
+    }
+    getBakeResult(item) {
+        if (item === 'dough')
+            return 'bread';
+        if (item === 'batter')
+            return 'sponge-cake';
+        return 'ruined-food';
+    }
+    getFryResult(item) {
+        if (item === 'chopped-fruit')
+            return 'jam';
+        if (item === 'egg')
+            return 'fried-egg';
+        return 'ruined-food';
+    }
+    getToppingResult(item) {
+        if (item === 'bread,egg')
+            return 'egg-toast';
+        if (item === 'bread, jam')
+            return 'jam-toast';
+        if (item === 'sponge-cake,chopped-fruit')
+            return 'fruit-cake';
+        return 'ruined-food';
+    }
+    canProcess(ingredients, stationId) {
+        const allRecipes = Array.from(this.recipes.values());
+        return allRecipes.some(recipe => {
+            return recipe.steps.some(step => {
+                return step.action === stationId.toUpperCase() &&
+                    step.item === ingredients.join('+');
+            });
+        });
+    }
+    arrayMatch(arr1, arr2) {
+        if (arr1.length !== arr2.length)
+            return false;
+        return arr1.every((val, index) => val === arr2[index]);
+    }
 }
-export {};
 //# sourceMappingURL=RecipeManager.js.map

@@ -6,11 +6,10 @@ export class Crates extends BaseStation {
     }
     interact(player) {
         //add player.holdItem(this.ingredientType);
-        if (!player.inventoryFull) {
+        if (!player.heldItem) {
             console.log(`Crate Opened. ${this.ingredientType} Grabbed`);
-            player.inventoryFull = true;
-            player.itemGrabbed = this.ingredientType;
-            console.log(player.itemGrabbed);
+            player.heldItem = this.ingredientType;
+            console.log(player.heldItem);
         }
     }
 }
