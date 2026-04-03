@@ -27,12 +27,6 @@ export class Oven extends ProcessingStation {
     interact(player) {
         super.interact(player);
     }
-    // private needsBaking(item: string): boolean {
-    //     return ['dough', 'batter'].includes(item);
-    // }
-    // private needsFrying(item: string): boolean {
-    //     return ['egg', 'chopped-fruit'].includes(item);
-    // }
     finishProcessing() {
         super.finishProcessing();
         const input = this.contents[0];

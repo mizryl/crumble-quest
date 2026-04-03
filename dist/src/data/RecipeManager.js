@@ -9,7 +9,7 @@ export class RecipeManager {
             title: 'Sponge Cake',
             ingredients: ['flour', 'egg'],
             steps: [
-                { action: 'PREP', item: 'flour+egg', output: 'flour' },
+                { action: 'PREP', item: 'flour+egg', output: 'batter' },
                 { action: 'BAKE', item: 'batter', output: 'sponge-cake' },
             ],
             bakeTime: 5,
@@ -23,7 +23,7 @@ export class RecipeManager {
             steps: [
                 { action: 'PREP', item: 'flour+egg', output: 'batter' },
                 { action: 'BAKE', item: 'batter', output: 'sponge-cake' },
-                { action: 'ADD', item: 'chopped-fruit', output: 'fruit-cake' }
+                { action: 'ADD', item: 'sponge-cake+chopped-fruit', output: 'fruit-cake' }
             ],
             bakeTime: 5,
             value: 50,
@@ -49,7 +49,7 @@ export class RecipeManager {
                 { action: 'PREP', item: 'flour', output: 'dough' },
                 { action: 'BAKE', item: 'dough', output: 'bread' },
                 { action: 'FRY', item: 'egg', output: 'fried-egg' },
-                { action: 'ADD', item: 'fried-egg', output: 'egg-toast' }
+                { action: 'ADD', item: 'bread+fried-egg', output: 'egg-toast' }
             ],
             bakeTime: 5,
             value: 35,
@@ -64,7 +64,7 @@ export class RecipeManager {
                 { action: 'BAKE', item: 'dough', output: 'bread' },
                 { action: 'PREP', item: 'fruit', output: 'chopped-fruit' },
                 { action: 'FRY', item: 'chopped-fruit', output: 'jam' },
-                { action: 'ADD', item: 'jam', output: 'jam-toast' }
+                { action: 'ADD', item: 'bread+jam', output: 'jam-toast' }
             ],
             bakeTime: 5,
             value: 30,
@@ -130,6 +130,20 @@ export class RecipeManager {
             return 'jam-toast';
         if (item === 'sponge-cake,chopped-fruit')
             return 'fruit-cake';
+        return 'ruined-food';
+    }
+    getResult(ingredients, action) {
+        const inputStr = [...ingredients].sort().join('+');
+        //look through recipes steps
+        for (const recipe of this.getAllRecipes()) {
+            const matchingStep = recipe.steps.find(step => {
+                const itemSorted = step.item.split('+').sort().join('+');
+                return step.action === action.toUpperCase() && itemSorted === inputStr;
+            });
+            if (matchingStep) {
+                return matchingStep.output;
+            }
+        }
         return 'ruined-food';
     }
     canProcess(ingredients, stationId) {

@@ -9,13 +9,17 @@ export class TileManager {
         this.tileImg[2] = loadImage('assets/img/wall1.png');
         this.tileImg[3] = loadImage('assets/img/wall2.png');
         const lines = loadStrings('assets/map.txt');
-        if (lines && lines.length > 0) {
-            this.map = lines.map(line => line.trim().split(/\+/).map(Number));
-            console.log("map loaded sucessfully", this.map);
-        }
-        else {
-            console.error("failed to load map.txt");
-        }
+        // if (lines && lines.length > 0) {
+        //     this.map = lines.map (line => 
+        //         line.trim().split(/\+/).map(Number)
+        //     );
+        //     console.log("map loaded sucessfully", this.map);
+        // } else {
+        //     console.error("failed to load map.txt");
+        // }
+        loadStrings('assets/map.txt', (result) => {
+            this.parseLoadedMap(result);
+        });
     }
     display() {
         if (this.map.length === 0)
