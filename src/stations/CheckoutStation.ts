@@ -18,11 +18,7 @@ export class CheckoutCounter extends BaseStation {
         
 
         push();
-        if (this.isHighlighted) {
-            tint(150, 150, 150);
-        } else {
-            noTint();
-        }
+        if (this.isHighlighted) tint(150);
 
         if (this.stationSprites) {
             push();

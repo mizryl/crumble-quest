@@ -1,32 +1,56 @@
 import { Image } from "p5";
 import { BaseStation } from "./BaseStation.js";
 import { TileManager } from "../world/TileManager.js";
+import { Player } from "../entities/Player.js";
+import { RecipeManager } from "../data/RecipeManager.js";
 
 export class PickupCounter extends BaseStation {
-    constructor(x: number, y: number, sprites: Image) {
+    protected contents: string[] = [];
+    private maxItem = 1;
+    recipeManager: RecipeManager;
+
+    constructor(x: number, y: number, sprites: Image, recipeManager: RecipeManager) {
         super(x, y, sprites, false, "pickup", false, true);
+        this.recipeManager = recipeManager;
     
     }
 
-    override interact() {
+    override interact(player: Player) {
+        // if (!player.heldItem) return;
+
+        //deposit
+        if (player.heldItem && this.contents.length < this.maxItem) {
+            this.contents.push(player.heldItem);
+            player.heldItem = null;
+            console.log(`Placed ${this.contents[0]}`);
+            return;
+        //pickup
+        } else if (!player.heldItem && this.contents.length > 0) {
+            player.heldItem = this.contents.pop() || null;
+            console.log(`Picked Up ${player.heldItem}`);
+        }
 
     }
 
     override display(): void {
-        const size = TileManager.TILE_SIZE;
+        super.display();
 
-        push();
-        if  (this.isHighlighted) {
-            tint(150, 150, 150);
-        } else {
-            noTint();
+
+        if (this.contents.length > 0) {
+            const itemName = this.contents[0];
+            const img = this.recipeManager.getSprite(itemName);
+            const size = TileManager.TILE_SIZE;
+            let px = this.x * size;
+            let py = this.y * size;
+
+            if (img) {
+                image(img, this.x * size + size/4, this.y * size - 20, size - 32, size - 32);
+            } else {
+                fill(77, 61, 47); 
+                textSize(5);
+                text(itemName, this.x * size + px/2, this.y);
+            }
         }
-
-        if (this.stationSprites) {
-            image(this.stationSprites, this.x * size, this.y * size, size *2, size);
-        }
-
-        pop();
 
     }
 
@@ -35,7 +59,7 @@ export class PickupCounter extends BaseStation {
         return {
             x: checkX * size,
             y: (checkY * size) - (size * 0.25),
-            w: size * 2, // Matches the size * 2 in display()
+            w: size,
             h: size * 1.2
         };
     }

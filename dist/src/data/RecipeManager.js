@@ -1,6 +1,7 @@
 export class RecipeManager {
     constructor() {
         this.recipes = new Map();
+        this.itemSprites = {};
         this.loadRecipes();
     }
     loadRecipes() {
@@ -85,7 +86,7 @@ export class RecipeManager {
         return Array.from(this.recipes.values());
     }
     getPrepResult(ingredients) {
-        const sortedInput = [...ingredients].sort().join(',');
+        const sortedInput = [...ingredients].sort().join('+');
         //single item
         if (ingredients.length === 1) {
             const item = ingredients[0];
@@ -97,41 +98,34 @@ export class RecipeManager {
         }
         //multi-item
         if (ingredients.length === 2) {
-            if (sortedInput === 'egg,flour')
+            if (sortedInput === 'egg+flour')
                 return 'batter';
         }
         //jam toast assemble
-        if (sortedInput === 'bread,jam')
+        if (sortedInput === 'bread+jam')
             return 'jam-toast';
-        if (sortedInput === 'bread,fried-egg')
+        if (sortedInput === 'bread+fried-egg')
             return 'egg-toast';
-        if (sortedInput === 'sponge-cake,chopped-fruit')
+        if (sortedInput === 'sponge-cake+chopped-fruit')
             return 'fruit-cake';
         return 'ruined-food';
     }
-    getBakeResult(item) {
-        if (item === 'dough')
-            return 'bread';
-        if (item === 'batter')
-            return 'sponge-cake';
-        return 'ruined-food';
-    }
-    getFryResult(item) {
-        if (item === 'chopped-fruit')
-            return 'jam';
-        if (item === 'egg')
-            return 'fried-egg';
-        return 'ruined-food';
-    }
-    getToppingResult(item) {
-        if (item === 'bread,egg')
-            return 'egg-toast';
-        if (item === 'bread, jam')
-            return 'jam-toast';
-        if (item === 'sponge-cake,chopped-fruit')
-            return 'fruit-cake';
-        return 'ruined-food';
-    }
+    // getBakeResult(item: string): string {
+    //     if (item === 'dough') return 'bread';
+    //     if (item === 'batter') return 'sponge-cake';
+    //     return 'ruined-food';
+    // }
+    // getFryResult(item: string): string {
+    //     if (item === 'chopped-fruit') return 'jam';
+    //     if (item === 'egg') return 'fried-egg';
+    //     return 'ruined-food'; 
+    // }
+    // getToppingResult(item: string): string {
+    //     if (item === 'bread,egg') return 'egg-toast';
+    //     if (item === 'bread, jam') return 'jam-toast';
+    //     if (item === 'sponge-cake,chopped-fruit') return 'fruit-cake';
+    //     return 'ruined-food';
+    // }
     getResult(ingredients, action) {
         const inputStr = [...ingredients].sort().join('+');
         //look through recipes steps
@@ -147,18 +141,22 @@ export class RecipeManager {
         return 'ruined-food';
     }
     canProcess(ingredients, stationId) {
-        const allRecipes = Array.from(this.recipes.values());
+        const sortedInput = [...ingredients].sort().join('+');
+        const allRecipes = this.getAllRecipes();
         return allRecipes.some(recipe => {
             return recipe.steps.some(step => {
-                return step.action === stationId.toUpperCase() &&
-                    step.item === ingredients.join('+');
+                // return step.action === stationId.toUpperCase() &&
+                //         step.item === ingredients.join('+');
+                const stepSorted = step.item.split('+').sort().join('+');
+                return step.action === stationId.toUpperCase() && stepSorted === sortedInput;
             });
         });
     }
-    arrayMatch(arr1, arr2) {
-        if (arr1.length !== arr2.length)
-            return false;
-        return arr1.every((val, index) => val === arr2[index]);
+    registerSprite(key, img) {
+        this.itemSprites[key] = img;
+    }
+    getSprite(itemkey) {
+        return this.itemSprites[itemkey] || null;
     }
 }
 //# sourceMappingURL=RecipeManager.js.map

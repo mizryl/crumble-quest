@@ -10,12 +10,8 @@ export class CheckoutCounter extends BaseStation {
     display() {
         const size = TileManager.TILE_SIZE;
         push();
-        if (this.isHighlighted) {
-            tint(150, 150, 150);
-        }
-        else {
-            noTint();
-        }
+        if (this.isHighlighted)
+            tint(150);
         if (this.stationSprites) {
             push();
             image(this.stationSprites, this.x * size, this.y * size, size * 2, size);

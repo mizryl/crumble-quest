@@ -61,7 +61,8 @@ function preload(): void {
   stationSprites['fruit'] = loadImage('assets/img/fruit.png');
   stationSprites['oven'] = loadImage('assets/img/oven.png');
   stationSprites['prep'] = loadImage('assets/img/prep-table.png');
-  stationSprites['pickup'] = loadImage('assets/img/counter.png');
+  stationSprites['pickup-left'] = loadImage('assets/img/counter-left.png');
+  stationSprites['pickup-right'] = loadImage('assets/img/counter-right.png');
   stationSprites['display'] = loadImage('assets/img/display.png');
   stationSprites['checkout'] = loadImage('assets/img/counter.png');
   stationSprites['trash'] = loadImage('assets/img/trash.png');
@@ -102,14 +103,24 @@ function setup(): void {
   stations.push(new PrepTable(7, 1.5, stationSprites['prep'], recipeManager, 2));
   stations.push(new PrepTable(8, 1.5, stationSprites['prep'], recipeManager, 2));
   stations.push(new Trash(1, 1.5, stationSprites['trash']));
-  frontStations.push(new PickupCounter(8, 4.5, stationSprites['pickup']));
-  frontStations.push(new PickupCounter(10, 4.5, stationSprites['pickup']));
-  frontStations.push(new PickupCounter(12, 4.5, stationSprites['pickup']));
-  frontStations.push(new PickupCounter(14, 4.5, stationSprites['pickup']));
+  frontStations.push(new PickupCounter(8, 4.5, stationSprites['pickup-left'], recipeManager));
+  frontStations.push(new PickupCounter(9, 4.5, stationSprites['pickup-right'], recipeManager));
+  frontStations.push(new PickupCounter(10, 4.5, stationSprites['pickup-left'], recipeManager));
+  frontStations.push(new PickupCounter(11, 4.5, stationSprites['pickup-right'], recipeManager));
+  frontStations.push(new PickupCounter(12, 4.5, stationSprites['pickup-left'], recipeManager));
+  frontStations.push(new PickupCounter(13, 4.5, stationSprites['pickup-right'], recipeManager));
+  frontStations.push(new PickupCounter(14, 4.5, stationSprites['pickup-left'], recipeManager));
   frontStations.push(new DisplayCounter(0, 3.5, stationSprites['display']));
   frontStations.push(new DisplayCounter(2, 3.5, stationSprites['display']));
   frontStations.push(new DisplayCounter(6, 3.5, stationSprites['display']));
   frontStations.push(new CheckoutCounter(4, 4.5, stationSprites['checkout']));
+  //food
+  recipeManager.registerSprite('sponge-cake', loadImage('assets/img/food/sponge-cake.png'));
+  recipeManager.registerSprite('fruit-cake', loadImage('assets/img/food/fruit-cake.png'));
+  recipeManager.registerSprite('bread', loadImage('assets/img/food/bread.png'));
+  recipeManager.registerSprite('egg-toast', loadImage('assets/img/food/egg-toast.png'));
+  recipeManager.registerSprite('jam-toast', loadImage('assets/img/food/jam-toast.png'));
+  recipeManager.registerSprite('ruined-food', loadImage('assets/img/food/ruined-food.png'));
 }
 
 function draw(): void {
@@ -189,7 +200,13 @@ function drawGameWorld(): void {
   for (let s of frontStations) {
     s.display();
   }
-  
+
+  for (let s of stations) {
+    if (s instanceof Oven || s instanceof PrepTable) {
+      s.drawInterface();
+    }
+  }
+ 
 
 }
 

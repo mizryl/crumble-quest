@@ -3,6 +3,7 @@ import { ProcessingStation } from "../stations/ProcessingStation.js";
 
 export class RecipeManager {
     recipes: Map<string, Recipe> = new Map();
+    private itemSprites: { [key: string]: any} = {};
 
     constructor() {
         this.loadRecipes();
@@ -66,7 +67,6 @@ export class RecipeManager {
             spriteKey: 'egg-toast'
         });
 
-
         this.addRecipe({
             id: 'jam-toast',
             title: 'Jam Toast',
@@ -103,7 +103,7 @@ export class RecipeManager {
     }
 
     getPrepResult(ingredients: string[]) : string {
-        const sortedInput = [...ingredients].sort().join(',');
+        const sortedInput = [...ingredients].sort().join('+');
 
         //single item
         if (ingredients.length === 1) {
@@ -115,36 +115,36 @@ export class RecipeManager {
 
         //multi-item
         if (ingredients.length === 2) {
-            if (sortedInput === 'egg,flour') return 'batter';
+            if (sortedInput === 'egg+flour') return 'batter';
         }
 
         //jam toast assemble
-        if (sortedInput === 'bread,jam') return 'jam-toast';
-        if (sortedInput === 'bread,fried-egg') return 'egg-toast';
-        if (sortedInput === 'sponge-cake,chopped-fruit') return 'fruit-cake';
+        if (sortedInput === 'bread+jam') return 'jam-toast';
+        if (sortedInput === 'bread+fried-egg') return 'egg-toast';
+        if (sortedInput === 'sponge-cake+chopped-fruit') return 'fruit-cake';
 
         return 'ruined-food';        
 
     }
 
-    getBakeResult(item: string): string {
-        if (item === 'dough') return 'bread';
-        if (item === 'batter') return 'sponge-cake';
-        return 'ruined-food';
-    }
+    // getBakeResult(item: string): string {
+    //     if (item === 'dough') return 'bread';
+    //     if (item === 'batter') return 'sponge-cake';
+    //     return 'ruined-food';
+    // }
 
-    getFryResult(item: string): string {
-        if (item === 'chopped-fruit') return 'jam';
-        if (item === 'egg') return 'fried-egg';
-        return 'ruined-food'; 
-    }
+    // getFryResult(item: string): string {
+    //     if (item === 'chopped-fruit') return 'jam';
+    //     if (item === 'egg') return 'fried-egg';
+    //     return 'ruined-food'; 
+    // }
 
-    getToppingResult(item: string): string {
-        if (item === 'bread,egg') return 'egg-toast';
-        if (item === 'bread, jam') return 'jam-toast';
-        if (item === 'sponge-cake,chopped-fruit') return 'fruit-cake';
-        return 'ruined-food';
-    }
+    // getToppingResult(item: string): string {
+    //     if (item === 'bread,egg') return 'egg-toast';
+    //     if (item === 'bread, jam') return 'jam-toast';
+    //     if (item === 'sponge-cake,chopped-fruit') return 'fruit-cake';
+    //     return 'ruined-food';
+    // }
 
     getResult(ingredients: string[], action: string): string {
         const inputStr = [...ingredients].sort().join('+');
@@ -165,20 +165,25 @@ export class RecipeManager {
     }
 
     public canProcess(ingredients: string[], stationId: string): boolean {
-       const allRecipes = Array.from(this.recipes.values());
+        const sortedInput = [...ingredients].sort().join('+');
+        const allRecipes = this.getAllRecipes();
        
         return allRecipes.some(recipe => {
             return recipe.steps.some(step => {
-                return step.action === stationId.toUpperCase() &&
-                        step.item === ingredients.join('+');
+                // return step.action === stationId.toUpperCase() &&
+                //         step.item === ingredients.join('+');
+                const stepSorted = step.item.split('+').sort().join('+');
+                return step.action === stationId.toUpperCase() && stepSorted === sortedInput;
             })
         })
     }
 
-    private arrayMatch(arr1: string[], arr2: string[]) : boolean {
-        if (arr1.length !== arr2.length) return false;
+    public registerSprite(key: string, img: any): void {
+        this.itemSprites[key] = img;
+    }
 
-        return arr1.every((val, index) => val === arr2[index]); 
+    public getSprite(itemkey: string): any {
+        return this.itemSprites[itemkey] || null;
     }
 
 }

@@ -3,8 +3,6 @@ import { TileManager } from "../world/TileManager.js";
 export class DisplayCounter extends BaseStation {
     constructor(x, y, sprites) {
         super(x, y, sprites, false, "display", false, false);
-        // this.isInteractive = false;
-        // this.isSolid = false;
     }
     interact() {
     }
@@ -19,7 +17,7 @@ export class DisplayCounter extends BaseStation {
         return {
             x: checkX * size,
             y: (checkY * size) + (size * 0.25),
-            w: size * 2, // Correct: 2 tiles wide
+            w: size * 2, //2 tiles wide
             h: size
         };
     }
