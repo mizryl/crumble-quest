@@ -8,7 +8,6 @@ export class PickupCounter extends BaseStation {
         this.recipeManager = recipeManager;
     }
     interact(player) {
-        // if (!player.heldItem) return;
         //deposit
         if (player.heldItem && this.contents.length < this.maxItem) {
             this.contents.push(player.heldItem);

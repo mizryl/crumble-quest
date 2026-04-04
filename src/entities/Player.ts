@@ -116,15 +116,15 @@ export class Player extends Entity {
 
     }
 
-    override display(): void {
-        let img = this.currentAnimation[this.currentFrame];
-        const size = TileManager.TILE_SIZE;
-        // Calculate height based on the image's original proportions
-        let displayWidth = this.tileSize; 
-        let displayHeight = this.tileSize * (img.height / img.width); 
+    // override display(): void {
+    //     let img = this.currentAnimation[this.currentFrame];
+    //     const size = TileManager.TILE_SIZE;
+    //     // Calculate height based on the image's original proportions
+    //     let displayWidth = this.tileSize; 
+    //     let displayHeight = this.tileSize * (img.height / img.width); 
             
-        image(img, this.x * size, this.y * size, displayWidth, displayHeight);
-    }
+    //     image(img, this.x * size, this.y * size, displayWidth, displayHeight);
+    // }
 
     private checkStationProximity(stations: BaseStation[]): void {
     const size = TileManager.TILE_SIZE;

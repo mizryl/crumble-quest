@@ -22,9 +22,14 @@ export class Oven extends ProcessingStation {
             let py = this.y * size;
 
             if (img) {
-                fill(255, 255, 255, 50);
-                ellipse(px, py, size/4 + 4);
-                image(img, px+ size/4, py - 20, size/2, size/2);
+                push();
+                fill(255, 255, 255, 75);
+                translate(0, -25);
+                ellipse(px + size/2, py - 2, size/1.5);
+ 
+                image(img, px + size/4, py - 20, size/2, size/2);
+
+                pop();
             } else {
                 fill(77, 61, 47); 
                 textSize(5);

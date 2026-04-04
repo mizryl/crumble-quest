@@ -16,7 +16,6 @@ export class PickupCounter extends BaseStation {
     }
 
     override interact(player: Player) {
-        // if (!player.heldItem) return;
 
         //deposit
         if (player.heldItem && this.contents.length < this.maxItem) {

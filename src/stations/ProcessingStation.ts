@@ -45,7 +45,7 @@ export abstract class ProcessingStation extends BaseStation {
             noStroke();
             textSize(10);
             textAlign(LEFT);
-            text(itemName, offsetX, offsetY);
+            text(itemName, offsetX, offsetY - 10);
         });
     }
 

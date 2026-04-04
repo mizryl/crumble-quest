@@ -90,14 +90,14 @@ export class Player extends Entity {
         }
         this.checkStationProximity(stations);
     }
-    display() {
-        let img = this.currentAnimation[this.currentFrame];
-        const size = TileManager.TILE_SIZE;
-        // Calculate height based on the image's original proportions
-        let displayWidth = this.tileSize;
-        let displayHeight = this.tileSize * (img.height / img.width);
-        image(img, this.x * size, this.y * size, displayWidth, displayHeight);
-    }
+    // override display(): void {
+    //     let img = this.currentAnimation[this.currentFrame];
+    //     const size = TileManager.TILE_SIZE;
+    //     // Calculate height based on the image's original proportions
+    //     let displayWidth = this.tileSize; 
+    //     let displayHeight = this.tileSize * (img.height / img.width); 
+    //     image(img, this.x * size, this.y * size, displayWidth, displayHeight);
+    // }
     checkStationProximity(stations) {
         const size = TileManager.TILE_SIZE;
         //reset highlights

@@ -16,8 +16,18 @@ export class Entity {
         this.x = x;
         this.y = y;
         this.speed = speed;
+        this.isMoving = moving;
         this.currentAnimation = this.down;
     }
+    display() {
+        let img = this.currentAnimation[this.currentFrame];
+        const size = TileManager.TILE_SIZE;
+        // Calculate height based on the image's original proportions
+        let displayWidth = size;
+        let displayHeight = size * (img.height / img.width);
+        image(img, this.x * size, this.y * size, displayWidth, displayHeight);
+    }
+    // abstract display(): void;
     getHitbox(checkX = this.x, checkY = this.y) {
         const size = TileManager.TILE_SIZE;
         // const padding = size * 0.1;

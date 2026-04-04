@@ -10,6 +10,7 @@ import { DisplayCounter } from './src/stations/DisplayCounter.js';
 import { CheckoutCounter } from './src/stations/CheckoutStation.js';
 import { Trash } from './src/stations/Trash.js';
 import { RecipeManager } from './src/data/RecipeManager.js';
+import { Customer } from './src/entities/Customer.js';
 //start screen 
 let startBtn;
 let loadBtn;
@@ -22,6 +23,12 @@ let playerSprites = { up: [], down: [], left: [], right: [] };
 let stations = [];
 let frontStations = [];
 let stationSprites = {};
+const customerSprites = {
+    'c1': { up: [], down: [], left: [], right: [] },
+    'c2': { up: [], down: [], left: [], right: [] },
+    'c3': { up: [], down: [], left: [], right: [] },
+    'c4': { up: [], down: [], left: [], right: [] }
+};
 //game-related
 let player;
 let keyH;
@@ -52,6 +59,16 @@ function preload() {
     stationSprites['display'] = loadImage('assets/img/display.png');
     stationSprites['checkout'] = loadImage('assets/img/counter.png');
     stationSprites['trash'] = loadImage('assets/img/trash.png');
+    //customer
+    for (let c = 2; c <= 4; c++) {
+        let id = `c${c}`;
+        for (let i = 1; i <= 4; i++) {
+            customerSprites[id].up.push(loadImage(`assets/img/${id}up${i}.png`));
+            // customerSprites[id].down.push(loadImage(`assets/img/${id}down${i}.png`));
+            // customerSprites[id].left.push(loadImage(`assets/img/${id}left${i}.png`));
+            // customerSprites[id].right.push(loadImage(`assets/img/${id}right${i}.png`));
+        }
+    }
 }
 function setup() {
     noSmooth();
@@ -159,6 +176,15 @@ function drawGameWorld() {
             s.drawInterface();
         }
     }
+}
+function spawnCustomer() {
+    const spriteKey = Object.keys(customerSprites);
+    const randomKey = random(spriteKey);
+    const selectedSprites = customerSprites[randomKey];
+    const allRecipes = recipeManager.getAllRecipes();
+    const randomRecipe = random(allRecipes);
+    // const newCust = new Customer(0, 7 * 64, selectedSprites, randomRecipe.id, 5);
+    const newCust = new Customer(0, 7, selectedSprites, randomRecipe, 5, 5);
 }
 function drawResults() {
 }
