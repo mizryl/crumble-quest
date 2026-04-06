@@ -1,6 +1,9 @@
 import { Image } from "p5";
 import { BaseStation } from "./BaseStation.js";
 import { TileManager } from "../world/TileManager.js";
+import { Player } from "../entities/Player.js";
+import { Customer } from "../entities/Customer.js";
+import { customer, refreshQueue } from "../../sketch.js";
 
 export class CheckoutCounter extends BaseStation {
     constructor(x: number, y: number, sprites: Image) {
@@ -9,8 +12,19 @@ export class CheckoutCounter extends BaseStation {
     }
 
 
-    override interact(): void {
-        console.log("cash register");
+    override interact(player: Player): void {
+        const targetCustomer = customer.find(c =>
+            c.state === 'WAITING' && c.isAtDestination()
+        );
+    
+        if (targetCustomer && !targetCustomer.orderTaken) {
+            targetCustomer.orderTaken = true;
+            targetCustomer.state = 'ORDERED'; 
+            targetCustomer.order();
+
+            refreshQueue(); 
+            
+        }
     }
 
     override display() {
@@ -39,6 +53,8 @@ export class CheckoutCounter extends BaseStation {
             pop();
         }
         pop();
+
+        
     }
     public override getHitbox(checkX: number = this.x, checkY: number = this.y) {
         const size = TileManager.TILE_SIZE;

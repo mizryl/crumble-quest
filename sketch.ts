@@ -28,14 +28,15 @@ let mapData: string[];
 let playerSprites: SpriteData = { up: [], down: [], left: [], right: [] };
 let stations: BaseStation[] = [];
 let frontStations: BaseStation[] = [];
-
 let stationSprites: { [key: string]: Image } = {};
+export let customer: Customer[]= [];
+let spawnTimer = 0;
+const SPAWN_INTERVAL = 5000;
 
 const customerSprites: Record<string, any> = {
-  'c1': { up: [], down: [], left: [], right: []},
   'c2': { up: [], down: [], left: [], right: []},
-  'c3': { up: [], down: [], left: [], right: []},
-  'c4': { up: [], down: [], left: [], right: []}
+  'c3': { up: [], down: [], left: [], right: []}
+  // 'c4': { up: [], down: [], left: [], right: []}
 }
 
 //game-related
@@ -75,14 +76,14 @@ function preload(): void {
   stationSprites['trash'] = loadImage('assets/img/trash.png');
 
   //customer
-  for (let c = 2; c <= 4; c++) {
+  for (let c = 2; c <= 3; c++) {
     let id = `c${c}`;
 
       for (let i = 1; i <= 4; i++) {
         customerSprites[id].up.push(loadImage(`assets/img/${id}up${i}.png`));
-        // customerSprites[id].down.push(loadImage(`assets/img/${id}down${i}.png`));
-        // customerSprites[id].left.push(loadImage(`assets/img/${id}left${i}.png`));
-        // customerSprites[id].right.push(loadImage(`assets/img/${id}right${i}.png`));
+        customerSprites[id].down.push(loadImage(`assets/img/${id}down${i}.png`));
+        customerSprites[id].left.push(loadImage(`assets/img/${id}right${i}.png`));
+        customerSprites[id].right.push(loadImage(`assets/img/${id}right${i}.png`));
       }
   }
 
@@ -139,6 +140,9 @@ function setup(): void {
   recipeManager.registerSprite('egg-toast', loadImage('assets/img/food/egg-toast.png'));
   recipeManager.registerSprite('jam-toast', loadImage('assets/img/food/jam-toast.png'));
   recipeManager.registerSprite('ruined-food', loadImage('assets/img/food/ruined-food.png'));
+  // console.log("Recipes Loaded:", recipeManager.getAllRecipes().length);
+  // console.log("Customer Sprites Loaded:", Object.keys(customerSprites).length);
+  
 }
 
 function draw(): void {
@@ -224,21 +228,58 @@ function drawGameWorld(): void {
       s.drawInterface();
     }
   }
+
+  // console.log("Active Customers:", customer.length);
+  manageCustomer(dt);
+  // for (let c of customer) {
+  //   c.update(tileM, frontStations);
+  // }
+
+  
+
+
  
 
 }
 
-function spawnCustomer() {
-  
-  const spriteKey = Object.keys(customerSprites);
-  const randomKey = random(spriteKey);
-  const selectedSprites = customerSprites[randomKey];
+function manageCustomer(dt: number): void {
+spawnTimer += deltaTime;
 
-  const allRecipes = recipeManager.getAllRecipes();
-  const randomRecipe = random(allRecipes)
+// Change the condition to allow more than one customer (e.g., max 5)
+if (customer.length < 5 && spawnTimer > SPAWN_INTERVAL) {
+    const spriteKeys = Object.keys(customerSprites);
+    const randomKey = random(spriteKeys);
+    const selectedSprites = customerSprites[randomKey];
+    const allRecipes = recipeManager.getAllRecipes();
 
-  // const newCust = new Customer(0, 7 * 64, selectedSprites, randomRecipe.id, 5);
-  const newCust = new Customer(0, 7, selectedSprites, randomRecipe, 5, 5);
+    if (selectedSprites && allRecipes.length > 0) {
+        const randomRecipe = random(allRecipes);
+        
+        //vertical line queue
+        const queueX = 5; 
+        const queueY = 4 + (customer.length * 1);
+
+        const c = new Customer(-1, 8, selectedSprites, randomRecipe.id, queueX, queueY, recipeManager);
+        customer.push(c);
+        refreshQueue();
+        spawnTimer = 0;
+    }
+}
+
+  for (let c of customer) {
+    c.update(tileM, frontStations);
+    c.display();
+  }
+}
+
+export function refreshQueue() {
+  const waitingArea = customer.filter(c => c.state === 'WALK-IN' || c.state === 'WAITING');
+
+  waitingArea.forEach((c, index) => {
+    const queueX = 5;
+    const queueY = 4 + index;
+    c.setTarget(queueX, queueY);
+  });
 }
 
 function drawResults(): void {

@@ -1,11 +1,18 @@
 import { BaseStation } from "./BaseStation.js";
 import { TileManager } from "../world/TileManager.js";
+import { customer, refreshQueue } from "../../sketch.js";
 export class CheckoutCounter extends BaseStation {
     constructor(x, y, sprites) {
         super(x, y, sprites, false, "checkout", false, true);
     }
-    interact() {
-        console.log("cash register");
+    interact(player) {
+        const targetCustomer = customer.find(c => c.state === 'WAITING' && c.isAtDestination());
+        if (targetCustomer && !targetCustomer.orderTaken) {
+            targetCustomer.orderTaken = true;
+            targetCustomer.state = 'ORDERED';
+            targetCustomer.order();
+            refreshQueue();
+        }
     }
     display() {
         const size = TileManager.TILE_SIZE;

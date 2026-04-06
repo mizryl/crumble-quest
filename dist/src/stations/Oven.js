@@ -15,8 +15,8 @@ export class Oven extends ProcessingStation {
             if (img) {
                 push();
                 fill(255, 255, 255, 75);
-                translate(0, -25);
-                ellipse(px + size / 2, py - 2, size / 1.5);
+                // translate(0, -25);
+                // ellipse(px + size/2, py - 2, size/1.5);
                 image(img, px + size / 4, py - 20, size / 2, size / 2);
                 pop();
             }
