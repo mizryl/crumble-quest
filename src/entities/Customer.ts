@@ -15,6 +15,9 @@ export class Customer extends Entity {
     private hasSetWaitingSpot: boolean = false;
     private slot: any = null;
     private targetCounter : any;
+    private patience: number = 45;
+    private maxPatience: number = 45;
+    private moodSprites: any;
 
     private static waitingSlots = [
         {x: 8, y: 7, occupied: false},
@@ -28,9 +31,10 @@ export class Customer extends Entity {
 
     recipeManager: RecipeManager;
     hud: HUD;
+
     
     constructor(x: number, y: number, sprites: any, recipe: string, 
-                targetX: number, targetY: number, recipeManager: RecipeManager, hud: HUD) {
+                targetX: number, targetY: number, recipeManager: RecipeManager, hud: HUD, mood: any) {
         super(x, y, true, 0.05, sprites);     
         
         this.targetX = targetX;
@@ -39,6 +43,8 @@ export class Customer extends Entity {
         this.currentAnimation = this.right;
         this.recipeManager = recipeManager;
         this.hud = hud;
+
+        this.moodSprites = mood;
     }
 
     override display() {
@@ -46,6 +52,12 @@ export class Customer extends Entity {
         if (this.orderTaken && (this.state === 'ORDERED' || this.state === 'WAITING' || this.state === "WAITING_FOR_FOOD")) {
             this.order();
         }
+
+        if (this.state === "WAITING" || this.state === "WAITING_FOR_FOOD") {
+
+        }
+
+        this.displayPatienceIcon();
     }
 
     override update(tileM: TileManager, stations: BaseStation[]) {
@@ -72,10 +84,18 @@ export class Customer extends Entity {
             
             if (this.state === 'WALK-IN') {
                 this.state = 'WAITING';
+                this.recipeManager.recordWalkIn();
             } else if (this.state === 'ORDERED' && this.hasSetWaitingSpot) {
                 this.state = 'WAITING_FOR_FOOD';
             }
             
+        }
+
+        if (this.state === 'WAITING' || this.state === "WAITING_FOR_FOOD") {
+            this.patience -= deltaTime / 1000;
+            if (this.patience <= 0) {
+                this.leaveAngry();
+            }
         }
 
         if (this.state === 'ORDERED' && this.orderTaken && !this.hasSetWaitingSpot) {
@@ -88,6 +108,7 @@ export class Customer extends Entity {
         //go to pickup counter
         if (this.state === 'PICKUP_FOOD' && this.isAtDestination()) {
             this.finalizePickup();
+            this.recipeManager.recordSale(this.recipeName);
         }
         
         if (this.isMoving) {
@@ -229,6 +250,42 @@ export class Customer extends Entity {
         this.setTarget(this.x, 10);
         this.isMoving = true;
     }
+
+    public leaveAngry(): void {
+        this.leave();
+        this.hud.addScore(-20);
+    }
+
+    public displayPatienceIcon() {
+        if (this.state !== 'WAITING' && this.state !== 'WAITING_FOR_FOOD' && this.state !== 'ORDERED') {
+            return;
+        }
+        const size = TileManager.TILE_SIZE;
+        const percent = (this.patience / this.maxPatience) * 100;
+
+        let img;
+        if (percent > 60) img = this.moodSprites.happy;
+        else if (percent > 30) img = this.moodSprites.neutral;
+        else img = this.moodSprites.angry;
+        
+        push();
+        if (img) {
+            imageMode(CENTER);
+
+
+            const bob = Math.sin(frameCount * 0.1) * 2;
+            image(img, this.x * size + (size / 2), this.y * size + size + 5 + bob, 16, 16);
+        }
+        pop();
+    }
+
+    getMoodColour() {
+    const percent = (this.patience / this.maxPatience) * 100;
+    
+    if (percent > 60) return color(0, 255, 0);   // Happy (Green)
+    if (percent > 30) return color(255, 255, 0); // Neutral (Yellow)
+    return color(255, 0, 0);                     // Angry (Red)
+}
 
     public setTarget(tx: number, ty: number) {
         this.targetX = tx;

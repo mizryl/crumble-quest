@@ -12,9 +12,13 @@ import { Trash } from './src/stations/Trash.js';
 import { RecipeManager } from './src/data/RecipeManager.js';
 import { Customer } from './src/entities/Customer.js';
 import { HUD } from './src/ui/HUD.js';
-//start screen 
+import { ProcessingStation } from './src/stations/ProcessingStation.js';
+import { Button } from './src/ui/Button.js';
+//btns
 let startBtn;
 let loadBtn;
+let nextDayBtn;
+let returnBtn;
 let font;
 let cloudImg;
 //sprites-related
@@ -27,11 +31,17 @@ let stationSprites = {};
 //customer
 export let customer = [];
 let spawnTimer = 0;
-const SPAWN_INTERVAL = 5000;
+const SPAWN_INTERVAL = 8000;
 const customerSprites = {
     'c2': { up: [], down: [], left: [], right: [] },
     'c3': { up: [], down: [], left: [], right: [] }
     // 'c4': { up: [], down: [], left: [], right: []}
+};
+//moods
+let moodSprite = {
+    happy: null,
+    neutral: null,
+    angry: null
 };
 //game-related
 let player;
@@ -42,7 +52,7 @@ let gameState;
 let dayCount = 0;
 //recipe book 
 let searchQuery = '';
-let scrollY = 0; // Current scroll position of the list
+let scrollY = 0;
 let lastBackspaceTime = 0;
 const BACKSPACE_DELAY = 100;
 const maxQueryLength = 30;
@@ -76,20 +86,26 @@ function preload() {
         for (let i = 1; i <= 4; i++) {
             customerSprites[id].up.push(loadImage(`assets/img/${id}up${i}.png`));
             customerSprites[id].down.push(loadImage(`assets/img/${id}down${i}.png`));
-            customerSprites[id].left.push(loadImage(`assets/img/${id}right${i}.png`));
+            customerSprites[id].left.push(loadImage(`assets/img/${id}left${i}.png`));
             customerSprites[id].right.push(loadImage(`assets/img/${id}right${i}.png`));
         }
     }
+    //patience moods
+    moodSprite.happy = loadImage('assets/img/mood/happy.png');
+    moodSprite.neutral = loadImage('assets/img/mood/neutral.png');
+    moodSprite.angry = loadImage('assets/img/mood/mad.png');
 }
 function setup() {
     noSmooth();
     console.log("Setup is running!");
     tileM.parseLoadedMap(mapData);
     createCanvas(tileM.worldWidth, tileM.worldHeight);
-    //homescreen
+    //btns
     startBtn = new RollingPinButton(tileM.worldWidth / 2, tileM.worldHeight / 2, "NEW GAME");
     loadBtn = new RollingPinButton(tileM.worldWidth / 2, tileM.worldHeight / 2 + 100, "LOAD GAME");
-    gameState = "PLAYING";
+    nextDayBtn = new RollingPinButton(width / 2, height / 2 + 150, "START NEXT DAY");
+    returnBtn = new Button(width / 2, height / 2 + 210, 220, 40, "Return to Title Screen");
+    gameState = "RESULTS";
     textFont(font);
     textAlign(CENTER, CENTER);
     console.log("Game initialized in START state");
@@ -166,11 +182,25 @@ function mousePressed() {
     switch (gameState) {
         case "START":
             if (startBtn && startBtn.isClicked()) {
-                // startGame();
-                gameState = "PLAYING";
+                startGame();
+            }
+            if (loadBtn.isClicked()) {
+                loadGame();
+            }
+            break;
+        case "PLAYING":
+            if (player.currentTargetStation) {
+                player.currentTargetStation.interact(player);
             }
             break;
         case "RESULTS":
+            saveGame();
+            if (nextDayBtn && nextDayBtn.isClicked()) {
+                startNextDay();
+            }
+            if (returnBtn && returnBtn.isClicked()) {
+                gameState = "START";
+            }
             break;
     }
 }
@@ -234,7 +264,7 @@ function manageCustomer(dt) {
             //vertical line queue
             const queueX = 5;
             const queueY = 5 + (customer.length * 1);
-            const c = new Customer(-1, 8, selectedSprites, randomRecipe.id, queueX, queueY, recipeManager, hud);
+            const c = new Customer(-1, 8, selectedSprites, randomRecipe.id, queueX, queueY, recipeManager, hud, moodSprite);
             customer.push(c);
             refreshQueue();
             spawnTimer = 0;
@@ -371,18 +401,48 @@ function drawResults() {
     text(`Day ${hud.getDayCount()} Complete!`, 0, -240);
     textAlign(LEFT, CENTER);
     fill(87, 78, 62);
-    textSize(24);
+    textSize(20);
     text(`Total Earned: `, -220, -180);
     text(`Guest Served: `, -220, -140);
     text(`Most Baked Item: `, -220, -100);
     push();
+    const bestSeller = recipeManager.getBestSeller();
     textAlign(RIGHT, CENTER);
     translate(220, -180);
-    text('500', 0, 0);
-    text('8/10', 0, 40);
-    text('bread', 0, 80);
+    text(`$${hud.getScore()}`, 0, 0);
+    text(`${recipeManager.totalOrdersCompleted}/${recipeManager.totalCustomersEntered}`, 0, 40);
+    // text(bestSeller, 0, 80);
+    text(recipeManager.getTopSellingTitle(), 0, 80);
     pop();
     pop();
+    nextDayBtn.display();
+    nextDayBtn.checkHover();
+    returnBtn.display();
+    returnBtn.checkHover();
+}
+function startNextDay() {
+    hud.resetTimer();
+    customer = [];
+    spawnTimer = 0;
+    if (player && player.keyH) {
+        player.keyH.clearKeys(); // We will create this method below
+    }
+    // 3. Clear the stations (Remove any leftover dough/food on counters)
+    const allStations = [...stations, ...frontStations];
+    for (let s of allStations) {
+        if (s instanceof PickupCounter)
+            s.contents = [];
+        if (s instanceof ProcessingStation) {
+            s.isProcessing = false;
+            s.currentProgress = 0;
+            s.contents = [];
+        }
+    }
+    player.currentAnimation = player.down;
+    player.isMoving = false;
+    player.x = 5;
+    player.y = 2;
+    gameState = "PLAYING";
 }
 function mouseWheel(event) {
     if (gameState === "PAUSED") {
@@ -407,9 +467,10 @@ function drawCloudBorder() {
 }
 function startGame() {
     gameState = "PLAYING";
+    spawnTimer = SPAWN_INTERVAL;
 }
 function keyPressed() {
-    if (keyCode === ESCAPE) {
+    if (keyCode === ESCAPE || (key.toLowerCase() === 'r')) {
         if (gameState === 'PLAYING') {
             gameState = 'PAUSED';
         }
@@ -444,6 +505,31 @@ function keyTyped() {
                 searchQuery += key;
             }
         }
+    }
+}
+function saveGame() {
+    const gameStateData = {
+        day: hud.getDayCount(),
+        timer: hud.getTimer(),
+        score: hud.getScore(),
+        recipeStats: recipeManager.getSaveData()
+    };
+    //store as a string in the browser
+    localStorage.setItem('CrumbleQuestSave', JSON.stringify(gameStateData));
+    console.log("Game Saved.");
+}
+function loadGame() {
+    const savedString = localStorage.getItem('CrumbleQuestSave');
+    if (savedString) {
+        const data = JSON.parse(savedString);
+        hud.setDayCount(data.day);
+        hud.setTime(data.timer);
+        hud.setScore(data.score);
+        recipeManager.loadSaveData(data.recipeStats);
+        gameState = "PLAYING";
+    }
+    else {
+        console.log("No File Found.");
     }
 }
 window.preload = preload;

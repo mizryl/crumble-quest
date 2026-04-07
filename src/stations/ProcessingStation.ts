@@ -130,7 +130,7 @@ export abstract class ProcessingStation extends BaseStation {
         this.isProcessing = true;
         this.currentProgress += dt;
 
-        console.log(`Manual Progress: ${Math.floor((this.currentProgress / this.processingTime) * 100)}%`);
+        // console.log(`Manual Progress: ${Math.floor((this.currentProgress / this.processingTime) * 100)}%`);
 
         if (this.currentProgress >= this.processingTime) {
             this.finishProcessing();

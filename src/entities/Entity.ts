@@ -8,7 +8,7 @@ export abstract class Entity implements Collidable {
     public down: Image[] = [];
     public left: Image[] = [];
     public right: Image[] = [];
-    protected currentAnimation: Image[] = [];
+    public currentAnimation: Image[] = [];
     protected currentFrame: number = 0;
     protected spriteCounter: number = 0;
     isSolid: boolean = true;

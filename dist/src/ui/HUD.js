@@ -1,7 +1,7 @@
 export class HUD {
     constructor() {
         this.score = 0;
-        this.timer = 10;
+        this.timer = 150;
         this.dayCount = 0;
     }
     //score-related
@@ -32,7 +32,7 @@ export class HUD {
         this.timer = timer;
     }
     displayTimer(x, y, d) {
-        let totalDayTime = 10;
+        let totalDayTime = 150;
         let percent = this.timer / totalDayTime;
         let colour = color(232, 158, 67);
         push();
@@ -76,6 +76,7 @@ export class HUD {
         noStroke();
         circle(0, 0, 8);
         pop();
+        noStroke();
     }
     updateTime(dt) {
         if (this.timer > 0) {
@@ -86,11 +87,17 @@ export class HUD {
             this.addDayCount();
         }
     }
+    resetTimer() {
+        this.setTime(this.timer);
+    }
     addDayCount() {
         this.dayCount++;
     }
     getDayCount() {
         return this.dayCount;
+    }
+    setDayCount(day) {
+        this.dayCount = day;
     }
 }
 //# sourceMappingURL=HUD.js.map

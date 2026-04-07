@@ -3,7 +3,11 @@ import { ProcessingStation } from "../stations/ProcessingStation.js";
 
 export class RecipeManager {
     recipes: Map<string, Recipe> = new Map();
+    private servedStats: Map<string, number> = new Map();
     private itemSprites: { [key: string]: any} = {};
+
+    public totalCustomersEntered: number = 0;
+    public totalOrdersCompleted: number = 0;
 
     constructor() {
         this.loadRecipes();
@@ -250,4 +254,64 @@ public getFilteredRecipes(query: string, sortType: 'value' | 'title' | 'none'): 
         }
         return list;
     }
+
+    public recordSale(recipeId: string): void {
+        const bakeCount = this.servedStats.get(recipeId) || 0;
+        this.servedStats.set(recipeId, bakeCount + 1);
+        console.log(`${recipeId} has been baked ${bakeCount + 1} times.`);
+
+        this.totalOrdersCompleted++;
+
+    }
+
+    public getBestSeller(): Recipe[] {
+        const allRecipes = this.getAllRecipes();
+
+        return allRecipes.sort((a, b) => {
+            const countA = this.servedStats.get(a.id) || 0;
+            const countB = this.servedStats.get(b.id) || 0;
+
+            return countB - countA;
+        });
+
+    }
+
+    public getTopSellingTitle(): string {
+    const list = this.getBestSeller();
+    
+    // Check if the very first item in our sorted list has actually been sold
+    if (list.length > 0) {
+        const topItem = list[0];
+        const sales = this.servedStats.get(topItem.id) || 0;
+        
+        if (sales > 0) {
+            return topItem.title;
+        }
+    }
+    
+        return "None";
+    }
+
+    public recordWalkIn(): void {
+        this.totalCustomersEntered++;
+    }
+
+    public getSaveData() {
+        return {
+            totalOrders: this.totalOrdersCompleted,
+            totalWalkIns: this.totalCustomersEntered,
+            // Convert the Map to an Object so JSON can handle it
+            stats: Object.fromEntries(this.servedStats)
+        };
+    }
+
+    public loadSaveData(data: any) {
+        this.totalOrdersCompleted = data.totalOrders || 0;
+        this.totalCustomersEntered = data.totalWalkIns || 0;
+        // Rebuild the Map from the saved object
+        this.servedStats = new Map(Object.entries(data.stats || {}));
+    }
+
+
+    
 }

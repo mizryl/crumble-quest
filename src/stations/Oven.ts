@@ -88,7 +88,7 @@ export class Oven extends ProcessingStation {
         //items are baked and fried automatically
         this.isProcessing = true;
         this.updateProgress(dt);
-        console.log(`Cooking Progress: ${Math.floor((this.currentProgress / this.processingTime) * 100)}%`);
+        // console.log(`Cooking Progress: ${Math.floor((this.currentProgress / this.processingTime) * 100)}%`);
     }
 
     override interact(player: Player): void {

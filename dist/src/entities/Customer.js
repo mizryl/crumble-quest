@@ -2,24 +2,30 @@ import { Entity } from "./Entity.js";
 import { TileManager } from "../world/TileManager.js";
 import { PickupCounter } from "../stations/PickupCounter.js";
 export class Customer extends Entity {
-    constructor(x, y, sprites, recipe, targetX, targetY, recipeManager, hud) {
+    constructor(x, y, sprites, recipe, targetX, targetY, recipeManager, hud, mood) {
         super(x, y, true, 0.05, sprites);
         this.state = 'WALK-IN';
         this.orderTaken = false;
         this.hasSetWaitingSpot = false;
         this.slot = null;
+        this.patience = 45;
+        this.maxPatience = 45;
         this.targetX = targetX;
         this.targetY = targetY;
         this.recipeName = recipe;
         this.currentAnimation = this.right;
         this.recipeManager = recipeManager;
         this.hud = hud;
+        this.moodSprites = mood;
     }
     display() {
         super.display();
         if (this.orderTaken && (this.state === 'ORDERED' || this.state === 'WAITING' || this.state === "WAITING_FOR_FOOD")) {
             this.order();
         }
+        if (this.state === "WAITING" || this.state === "WAITING_FOR_FOOD") {
+        }
+        this.displayPatienceIcon();
     }
     update(tileM, stations) {
         const dx = this.targetX - this.x;
@@ -42,9 +48,16 @@ export class Customer extends Entity {
             this.y = this.targetY;
             if (this.state === 'WALK-IN') {
                 this.state = 'WAITING';
+                this.recipeManager.recordWalkIn();
             }
             else if (this.state === 'ORDERED' && this.hasSetWaitingSpot) {
                 this.state = 'WAITING_FOR_FOOD';
+            }
+        }
+        if (this.state === 'WAITING' || this.state === "WAITING_FOR_FOOD") {
+            this.patience -= deltaTime / 1000;
+            if (this.patience <= 0) {
+                this.leaveAngry();
             }
         }
         if (this.state === 'ORDERED' && this.orderTaken && !this.hasSetWaitingSpot) {
@@ -57,6 +70,7 @@ export class Customer extends Entity {
         //go to pickup counter
         if (this.state === 'PICKUP_FOOD' && this.isAtDestination()) {
             this.finalizePickup();
+            this.recipeManager.recordSale(this.recipeName);
         }
         if (this.isMoving) {
             this.animate();
@@ -178,6 +192,39 @@ export class Customer extends Entity {
         this.state = 'LEAVING';
         this.setTarget(this.x, 10);
         this.isMoving = true;
+    }
+    leaveAngry() {
+        this.leave();
+        this.hud.addScore(-20);
+    }
+    displayPatienceIcon() {
+        if (this.state !== 'WAITING' && this.state !== 'WAITING_FOR_FOOD' && this.state !== 'ORDERED') {
+            return;
+        }
+        const size = TileManager.TILE_SIZE;
+        const percent = (this.patience / this.maxPatience) * 100;
+        let img;
+        if (percent > 60)
+            img = this.moodSprites.happy;
+        else if (percent > 30)
+            img = this.moodSprites.neutral;
+        else
+            img = this.moodSprites.angry;
+        push();
+        if (img) {
+            imageMode(CENTER);
+            const bob = Math.sin(frameCount * 0.1) * 2;
+            image(img, this.x * size + (size / 2), this.y * size + size + 5 + bob, 16, 16);
+        }
+        pop();
+    }
+    getMoodColour() {
+        const percent = (this.patience / this.maxPatience) * 100;
+        if (percent > 60)
+            return color(0, 255, 0); // Happy (Green)
+        if (percent > 30)
+            return color(255, 255, 0); // Neutral (Yellow)
+        return color(255, 0, 0); // Angry (Red)
     }
     setTarget(tx, ty) {
         this.targetX = tx;

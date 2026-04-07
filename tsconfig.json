@@ -4,7 +4,7 @@
     "checkJs": true,
     "types": ["p5/global"],
     "module": "esnext",
-    "lib": ["DOM", "ES2016", "DOM.Iterable"],
+    "lib": ["DOM", "ES2020", "DOM.Iterable"],
     "outDir": "./dist",
     "rootDir": "./",
     "strict": true,

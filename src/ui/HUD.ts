@@ -2,7 +2,7 @@ import { Color } from "p5";
 
 export class HUD {
     private score: number = 0;
-    private timer: number = 10;
+    private timer: number = 150;
     private dayCount: number = 0;
 
     //score-related
@@ -40,7 +40,7 @@ export class HUD {
     }
 
     public displayTimer(x: number, y: number, d: number): void {
-        let totalDayTime = 10;
+        let totalDayTime = 150;
         let percent = this.timer / totalDayTime;
 
         let colour: any = color(232, 158, 67);
@@ -95,6 +95,7 @@ export class HUD {
         circle(0, 0, 8);
         
         pop();
+        noStroke();
     }
 
     public updateTime(dt: number): void {
@@ -106,12 +107,20 @@ export class HUD {
         }
     }
 
+    public resetTimer() {
+        this.setTime(this.timer);
+    }
+
     public addDayCount(){
         this.dayCount++;
     }
 
     public getDayCount(): number {
         return this.dayCount;
+    }
+
+    public setDayCount(day: number) {
+        this.dayCount = day;
     }
 
 

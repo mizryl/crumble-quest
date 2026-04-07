@@ -1,7 +1,10 @@
 export class RecipeManager {
     constructor() {
         this.recipes = new Map();
+        this.servedStats = new Map();
         this.itemSprites = {};
+        this.totalCustomersEntered = 0;
+        this.totalOrdersCompleted = 0;
         this.loadRecipes();
     }
     loadRecipes() {
@@ -210,6 +213,49 @@ export class RecipeManager {
             }
         }
         return list;
+    }
+    recordSale(recipeId) {
+        const bakeCount = this.servedStats.get(recipeId) || 0;
+        this.servedStats.set(recipeId, bakeCount + 1);
+        console.log(`${recipeId} has been baked ${bakeCount + 1} times.`);
+        this.totalOrdersCompleted++;
+    }
+    getBestSeller() {
+        const allRecipes = this.getAllRecipes();
+        return allRecipes.sort((a, b) => {
+            const countA = this.servedStats.get(a.id) || 0;
+            const countB = this.servedStats.get(b.id) || 0;
+            return countB - countA;
+        });
+    }
+    getTopSellingTitle() {
+        const list = this.getBestSeller();
+        // Check if the very first item in our sorted list has actually been sold
+        if (list.length > 0) {
+            const topItem = list[0];
+            const sales = this.servedStats.get(topItem.id) || 0;
+            if (sales > 0) {
+                return topItem.title;
+            }
+        }
+        return "None";
+    }
+    recordWalkIn() {
+        this.totalCustomersEntered++;
+    }
+    getSaveData() {
+        return {
+            totalOrders: this.totalOrdersCompleted,
+            totalWalkIns: this.totalCustomersEntered,
+            // Convert the Map to an Object so JSON can handle it
+            stats: Object.fromEntries(this.servedStats)
+        };
+    }
+    loadSaveData(data) {
+        this.totalOrdersCompleted = data.totalOrders || 0;
+        this.totalCustomersEntered = data.totalWalkIns || 0;
+        // Rebuild the Map from the saved object
+        this.servedStats = new Map(Object.entries(data.stats || {}));
     }
 }
 //# sourceMappingURL=RecipeManager.js.map

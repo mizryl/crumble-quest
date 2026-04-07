@@ -27,6 +27,22 @@ export class Button {
     }
 
     isClicked(): boolean {
-        return this.isHovered;
+        return this.isHovered && mouseIsPressed;
+    }
+
+    display(): void {
+        push();
+
+        noFill();
+        noStroke();
+        translate(this.x, this.y);
+        if (this.isHovered) scale(1.1);
+        rectMode(CENTER)
+        rect(0, 0, this.w, this.h);
+        fill(77, 61, 47);
+        textAlign(CENTER);
+        textSize(14);
+        text(this.label, 0, 0);
+        pop();
     }
 }

@@ -9,6 +9,7 @@ export class Player extends Entity {
         this.currentFrame = 0;
         this.debugMode = false;
         this.moving = false;
+        this.currentTargetStation = null;
         // inventoryFull: boolean = false;
         this.heldItem = null;
         this.keyH = keyH;
@@ -137,6 +138,7 @@ export class Player extends Entity {
         }
         if (targetStation) {
             targetStation.setHighlight(true);
+            this.currentTargetStation = targetStation;
             //single click (deposit/pickup)
             if (this.keyH.interactPressed) {
                 targetStation.interact(this);

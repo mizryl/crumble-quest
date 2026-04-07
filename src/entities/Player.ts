@@ -14,6 +14,7 @@ export class Player extends Entity {
     currentFrame: number = 0;
     debugMode = false;
     public moving: boolean = false;
+    public currentTargetStation: BaseStation | null = null;
 
     // inventoryFull: boolean = false;
     heldItem: string | null = null;
@@ -175,6 +176,7 @@ export class Player extends Entity {
 
     if (targetStation) {
         targetStation.setHighlight(true);
+        this.currentTargetStation = targetStation;
         
         //single click (deposit/pickup)
         if (this.keyH.interactPressed) {
