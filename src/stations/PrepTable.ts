@@ -13,8 +13,6 @@ export class PrepTable extends ProcessingStation {
         super.display();
         
         if (this.contents.length > 0) {
-            // const itemName = this.contents[0];
-            // const img = this.recipeManager.getSprite(itemName);
             const size = TileManager.TILE_SIZE;
             let px = this.x * size;
             let py = this.y * size;
@@ -28,12 +26,12 @@ export class PrepTable extends ProcessingStation {
                 if (img) {
                     image(img, offsetX, offsetY, size - 32, size - 32 );
                 } else {
-                    fill(255); // Nice dark brown for readability
+                    fill(255);
                     textSize(8);
                     textAlign(LEFT);
                     text(itemName, offsetX, offsetY);
                 }
-            })
+            });
         }
     }
 

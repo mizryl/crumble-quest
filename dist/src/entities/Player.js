@@ -3,8 +3,8 @@ import { TileManager } from "../world/TileManager.js";
 import { ProcessingStation } from "../stations/ProcessingStation.js";
 import { Oven } from "../stations/Oven.js";
 export class Player extends Entity {
-    constructor(x, y, sprites, keyH) {
-        super(x, y, false, 0.05, sprites);
+    constructor(x, y, sprites, keyH, recipeManager) {
+        super(x, y, false, 0.06, sprites);
         this.tileSize = TileManager.TILE_SIZE;
         this.currentFrame = 0;
         this.debugMode = false;
@@ -13,10 +13,20 @@ export class Player extends Entity {
         this.heldItem = null;
         this.keyH = keyH;
         this.currentAnimation = this.down;
+        this.recipeManager = recipeManager;
+    }
+    display() {
+        super.display();
+        if (this.heldItem !== null) {
+            this.drawHeldItem();
+        }
     }
     update(tileM, stations) {
         let nextX = this.x;
         let nextY = this.y;
+        if (this.heldItem !== null) {
+            this.drawHeldItem();
+        }
         this.moving = this.keyH.upPressed || this.keyH.downPressed ||
             this.keyH.leftPressed || this.keyH.rightPressed;
         if (this.keyH.upPressed) {
@@ -47,7 +57,7 @@ export class Player extends Entity {
         }
         //boundaries
         nextX = constrain(nextX, 0, (tileM.worldWidth / this.tileSize) - 1);
-        nextY = constrain(nextY, 0.1, (tileM.worldHeight / this.tileSize) - 7);
+        nextY = constrain(nextY, 1.01, (tileM.worldHeight / this.tileSize) - 6);
         //collision 
         let collision = false;
         const playerHB = this.getHitbox(nextX, nextY);
@@ -90,14 +100,6 @@ export class Player extends Entity {
         }
         this.checkStationProximity(stations);
     }
-    // override display(): void {
-    //     let img = this.currentAnimation[this.currentFrame];
-    //     const size = TileManager.TILE_SIZE;
-    //     // Calculate height based on the image's original proportions
-    //     let displayWidth = this.tileSize; 
-    //     let displayHeight = this.tileSize * (img.height / img.width); 
-    //     image(img, this.x * size, this.y * size, displayWidth, displayHeight);
-    // }
     checkStationProximity(stations) {
         const size = TileManager.TILE_SIZE;
         //reset highlights
@@ -105,7 +107,7 @@ export class Player extends Entity {
             s.setHighlight(false);
         const interactX = this.x * size;
         const interactY = this.y * size + 64; //waist down of the player
-        //sensor box
+        //sensor box (Player's)
         const reachY = -32; //player has to stand on the tile to highlight
         const reachX = 15;
         let sensor = { x: 0, y: 0, w: 0, h: 0 };
@@ -116,10 +118,10 @@ export class Player extends Entity {
             sensor = { x: interactX + 10, y: (this.y * size) + 128, w: 44, h: reachY };
         }
         else if (this.currentAnimation === this.left) {
-            sensor = { x: interactX - reachX, y: interactY + 10, w: reachX, h: 44 };
+            sensor = { x: interactX - reachX + 20, y: interactY + 10, w: reachX, h: 44 };
         }
         else if (this.currentAnimation === this.right) {
-            sensor = { x: interactX + size, y: interactY + 10, w: reachX, h: 44 };
+            sensor = { x: interactX + size - 20, y: interactY + 10, w: reachX, h: 44 };
         }
         //Collision Check (AABB)
         let targetStation = null;
@@ -163,6 +165,37 @@ export class Player extends Entity {
             strokeWeight(2);
             rect(sensor.x, sensor.y, sensor.w, sensor.h);
             pop();
+        }
+    }
+    drawHeldItem() {
+        const size = TileManager.TILE_SIZE;
+        //bubble position
+        const bx = this.x * size;
+        const by = this.y * size - 60;
+        const bubbleW = 50;
+        const bubbleH = 45;
+        push();
+        fill(255);
+        noStroke();
+        translate(0, 10);
+        rect(bx + 5, by, bubbleW, bubbleH, 10);
+        triangle(bx + 20, by + bubbleH, bx + 30, by + bubbleH, bx + 25, by + bubbleH + 10);
+        pop();
+        if (this.heldItem !== null) {
+            const img = this.recipeManager.getSprite(this.heldItem);
+            if (img) {
+                imageMode(CENTER);
+                image(img, bx + 5 + (bubbleW / 2), by + (bubbleH / 2) + 10, 32, 32);
+                imageMode(CORNER); // Reset to default so it doesn't break other draws
+            }
+            else {
+                // Fallback if image isn't loaded: show text
+                noStroke();
+                fill(0);
+                textSize(8);
+                textAlign(CENTER, CENTER);
+                text(this.heldItem, bx + 5 + (bubbleW / 2), by + (bubbleH / 2));
+            }
         }
     }
 }

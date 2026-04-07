@@ -5,6 +5,7 @@ export class PickupCounter extends BaseStation {
         super(x, y, sprites, false, "pickup", false, true);
         this.contents = [];
         this.maxItem = 1;
+        this.isClaimed = false;
         this.recipeManager = recipeManager;
     }
     interact(player) {
@@ -12,12 +13,14 @@ export class PickupCounter extends BaseStation {
         if (player.heldItem && this.contents.length < this.maxItem) {
             this.contents.push(player.heldItem);
             player.heldItem = null;
+            this.isClaimed = false;
             console.log(`Placed ${this.contents[0]}`);
             return;
             //pickup
         }
         else if (!player.heldItem && this.contents.length > 0) {
             player.heldItem = this.contents.pop() || null;
+            this.isClaimed = false;
             console.log(`Picked Up ${player.heldItem}`);
         }
     }

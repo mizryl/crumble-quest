@@ -44,7 +44,7 @@ export class CheckoutCounter extends BaseStation {
             rect(this.x * size, this.y * size, 32, 16);
             //neck
             translate(this.x+ 4, size*2.3);
-            rect(this.x * size + 1, this.y+ 2 * size, 4, 8);
+            rect(this.x * size + 1, this.y+ 2 * size + 60, 4, 8);
             //screen
             translate(0, size *-2.55);
             rect(this.x * size, this.y * size, 16, 8);

@@ -6,13 +6,10 @@ export class KeyHandler {
         this.rightPressed = false;
         this.interactPressed = false;
         this.processPressed = false;
-        // public consumeInteract(): boolean {
-        //     if (this.interactPressed) {
-        //         this.interactPressed = false;
-        //         return true; //tells the game the player has interacted
-        //     }
-        //     return false; //tell the game, nothing to do here
-        // }
+        this.pausePressed = false;
+        this.backspacePressed = false;
+        this.backspaceTimer = 0;
+        this.backspaceDelay = 100;
     }
     handlePressed(k) {
         let keyLower = k.toLowerCase();
@@ -43,6 +40,15 @@ export class KeyHandler {
             this.interactPressed = false;
         if (keyLower === 'f')
             this.processPressed = false;
+    }
+    handleSearchBackspace(currentQuery) {
+        if (this.backspacePressed) {
+            if (millis() - this.backspaceTimer > this.backspaceDelay) {
+                this.backspaceTimer = millis();
+                return currentQuery.slice(0, -1);
+            }
+        }
+        return currentQuery;
     }
 }
 //# sourceMappingURL=KeyHandler.js.map

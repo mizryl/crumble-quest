@@ -5,8 +5,9 @@ import { Player } from "../entities/Player.js";
 import { RecipeManager } from "../data/RecipeManager.js";
 
 export class PickupCounter extends BaseStation {
-    protected contents: string[] = [];
+    public contents: string[] = [];
     private maxItem = 1;
+    public isClaimed: boolean = false;
     recipeManager: RecipeManager;
 
     constructor(x: number, y: number, sprites: Image, recipeManager: RecipeManager) {
@@ -21,11 +22,13 @@ export class PickupCounter extends BaseStation {
         if (player.heldItem && this.contents.length < this.maxItem) {
             this.contents.push(player.heldItem);
             player.heldItem = null;
+            this.isClaimed = false;
             console.log(`Placed ${this.contents[0]}`);
             return;
         //pickup
         } else if (!player.heldItem && this.contents.length > 0) {
             player.heldItem = this.contents.pop() || null;
+            this.isClaimed = false;
             console.log(`Picked Up ${player.heldItem}`);
         }
 
@@ -62,5 +65,7 @@ export class PickupCounter extends BaseStation {
             h: size * 1.2
         };
     }
+
+    
 
 }

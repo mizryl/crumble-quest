@@ -17,26 +17,57 @@ export class Oven extends ProcessingStation {
         if (this.contents.length > 0) {
             const itemName = this.contents[0];
             const img = this.recipeManager.getSprite(itemName);
-            const size = TileManager.TILE_SIZE;
-            let px = this.x * size;
-            let py = this.y * size;
+            // const size = TileManager.TILE_SIZE;
+            // let px = this.x * size;
+            // let py = this.y * size;
 
-            if (img) {
-                push();
-                fill(255, 255, 255, 75);
-                // translate(0, -25);
-                // ellipse(px + size/2, py - 2, size/1.5);
+        //     if (img) {
+        //         push();
+        //         fill(255, 255, 255, 75);
  
-                image(img, px + size/4, py - 20, size/2, size/2);
+        //         image(img, px + size/4, py - 20, size/2, size/2);
 
-                pop();
+        //         pop();
+        //     } else {
+        //         fill(77, 61, 47); 
+        //         textSize(5);
+        //         text(itemName, px + px/2, this.y);
+        //     }
+        // }
+        const size = TileManager.TILE_SIZE;
+            //bubble position
+            const bx = this.x * size;
+            const by = this.y * size - 60; 
+            const bubbleW = 50;
+            const bubbleH = 45;
+    
+            //bubble bkg
+            push();
+            fill(255);
+            noStroke();
+            rect(bx + 5, by, bubbleW, bubbleH, 10);
+    
+            //tail
+            triangle(bx + 20, by + bubbleH, bx + 30, by + bubbleH, bx + 25, by + bubbleH + 10);
+            pop();
+    
+            //use the recipeName to get the correct sprite from the manager
+            const foodImg = this.recipeManager.getSprite(itemName);
+            
+            if (img) {
+                imageMode(CENTER);
+                image(img, bx + 5 + (bubbleW / 2), by + (bubbleH / 2), 32, 32);
+                imageMode(CORNER); // Reset to default so it doesn't break other draws
             } else {
-                fill(77, 61, 47); 
-                textSize(5);
-                text(itemName, px + px/2, this.y);
+                // Fallback if image isn't loaded: show text
+                noStroke();
+                fill(0);
+                textSize(8);
+                textAlign(CENTER, CENTER);
+                text(itemName, bx + 5 + (bubbleW / 2), by + (bubbleH / 2));
             }
-        }
     }
+}
 
     public update(dt: number): void {
 
@@ -76,12 +107,6 @@ export class Oven extends ProcessingStation {
 
         const result = this.recipeManager.getResult(this.contents, action);
         this.contents = [result];
-
-        // if (this.recipeManager.canProcess(this.contents, "BAKE")) {
-        //     this.contents = [this.recipeManager.getBakeResult(input)];
-        // } else if (this.recipeManager.canProcess(this.contents, 'FRY')) {
-        //     this.contents = [this.recipeManager.getFryResult(input)];
-        // } 
 
         console.log(`DING! ${this.id} finished: ${this.contents[0]}`);
 

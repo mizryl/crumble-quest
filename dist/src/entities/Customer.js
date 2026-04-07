@@ -1,7 +1,8 @@
 import { Entity } from "./Entity.js";
 import { TileManager } from "../world/TileManager.js";
+import { PickupCounter } from "../stations/PickupCounter.js";
 export class Customer extends Entity {
-    constructor(x, y, sprites, recipe, targetX, targetY, recipeManager) {
+    constructor(x, y, sprites, recipe, targetX, targetY, recipeManager, hud) {
         super(x, y, true, 0.05, sprites);
         this.state = 'WALK-IN';
         this.orderTaken = false;
@@ -12,6 +13,7 @@ export class Customer extends Entity {
         this.recipeName = recipe;
         this.currentAnimation = this.right;
         this.recipeManager = recipeManager;
+        this.hud = hud;
     }
     display() {
         super.display();
@@ -48,6 +50,14 @@ export class Customer extends Entity {
         if (this.state === 'ORDERED' && this.orderTaken && !this.hasSetWaitingSpot) {
             this.prepareWaitingSlot();
         }
+        //scan for food
+        if (this.state === 'WAITING_FOR_FOOD') {
+            this.checkForOrder(stations);
+        }
+        //go to pickup counter
+        if (this.state === 'PICKUP_FOOD' && this.isAtDestination()) {
+            this.finalizePickup();
+        }
         if (this.isMoving) {
             this.animate();
         }
@@ -82,8 +92,6 @@ export class Customer extends Entity {
         //bubble bkg
         push();
         fill(255);
-        // stroke(50);
-        // strokeWeight(2);
         noStroke();
         rect(bx + 5, by, bubbleW, bubbleH, 10);
         //tail
@@ -136,13 +144,40 @@ export class Customer extends Entity {
             this.state = 'WAITING_FOR_FOOD';
         }
     }
+    checkForOrder(stations) {
+        for (let station of stations) {
+            if (station instanceof PickupCounter) {
+                if (station.contents.includes(this.recipeName) && !station.isClaimed) {
+                    station.isClaimed = true;
+                    this.targetCounter = station;
+                    this.setTarget(station.x, station.y);
+                    this.state = 'PICKUP_FOOD';
+                    this.isMoving = true;
+                    this.hasSetWaitingSpot = false;
+                    break; //stops looking after finding one
+                }
+            }
+        }
+    }
+    finalizePickup() {
+        if (this.targetCounter) {
+            this.targetCounter.contents = [];
+            this.targetCounter.isClaimed = false;
+        }
+        const payment = this.recipeManager.getValue(this.recipeName);
+        if (this.hud) {
+            this.hud.addScore(payment);
+        }
+        this.leave();
+    }
     leave() {
         if (this.slot) {
             this.slot.occupied = false;
             this.slot = null;
         }
         this.state = 'LEAVING';
-        this.setTarget(-5, 8);
+        this.setTarget(this.x, 10);
+        this.isMoving = true;
     }
     setTarget(tx, ty) {
         this.targetX = tx;
@@ -156,11 +191,11 @@ export class Customer extends Entity {
     }
 }
 Customer.waitingSlots = [
-    { x: 8, y: 6, occupied: false },
-    { x: 9, y: 6, occupied: false },
-    { x: 10, y: 6, occupied: false },
-    { x: 11, y: 6, occupied: false },
-    { x: 12, y: 6, occupied: false },
-    { x: 13, y: 6, occupied: false },
+    { x: 8, y: 7, occupied: false },
+    { x: 9, y: 7, occupied: false },
+    { x: 10, y: 7, occupied: false },
+    { x: 11, y: 7, occupied: false },
+    { x: 12, y: 7, occupied: false },
+    { x: 13, y: 7, occupied: false },
 ];
 //# sourceMappingURL=Customer.js.map

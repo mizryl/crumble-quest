@@ -14,7 +14,7 @@ export class RecipeManager {
                 { action: 'BAKE', item: 'batter', output: 'sponge-cake' },
             ],
             bakeTime: 5,
-            value: 50,
+            value: 40,
             spriteKey: 'sponge-cake'
         });
         this.addRecipe({
@@ -27,7 +27,7 @@ export class RecipeManager {
                 { action: 'ADD', item: 'sponge-cake+chopped-fruit', output: 'fruit-cake' }
             ],
             bakeTime: 5,
-            value: 50,
+            value: 75,
             spriteKey: 'fruit-cake'
         });
         this.addRecipe({
@@ -53,7 +53,7 @@ export class RecipeManager {
                 { action: 'ADD', item: 'bread+fried-egg', output: 'egg-toast' }
             ],
             bakeTime: 5,
-            value: 35,
+            value: 50,
             spriteKey: 'egg-toast'
         });
         this.addRecipe({
@@ -68,7 +68,7 @@ export class RecipeManager {
                 { action: 'ADD', item: 'bread+jam', output: 'jam-toast' }
             ],
             bakeTime: 5,
-            value: 30,
+            value: 100,
             spriteKey: 'jam-toast'
         });
     }
@@ -110,22 +110,6 @@ export class RecipeManager {
             return 'fruit-cake';
         return 'ruined-food';
     }
-    // getBakeResult(item: string): string {
-    //     if (item === 'dough') return 'bread';
-    //     if (item === 'batter') return 'sponge-cake';
-    //     return 'ruined-food';
-    // }
-    // getFryResult(item: string): string {
-    //     if (item === 'chopped-fruit') return 'jam';
-    //     if (item === 'egg') return 'fried-egg';
-    //     return 'ruined-food'; 
-    // }
-    // getToppingResult(item: string): string {
-    //     if (item === 'bread,egg') return 'egg-toast';
-    //     if (item === 'bread, jam') return 'jam-toast';
-    //     if (item === 'sponge-cake,chopped-fruit') return 'fruit-cake';
-    //     return 'ruined-food';
-    // }
     getResult(ingredients, action) {
         const inputStr = [...ingredients].sort().join('+');
         //look through recipes steps
@@ -157,6 +141,75 @@ export class RecipeManager {
     }
     getSprite(itemkey) {
         return this.itemSprites[itemkey] || null;
+    }
+    getValue(itemId) {
+        const recipe = this.getRecipeById(itemId);
+        if (recipe) {
+            return recipe.value;
+        }
+        return 0;
+    }
+    searchRecipes(query) {
+        const all = this.getAllRecipes();
+        if (!query || query.trim() === '')
+            return all;
+        let results = [];
+        let lowerQuery = query.toLowerCase();
+        for (let r of all) {
+            let mathName = (r.id.toLowerCase().includes(lowerQuery) ||
+                r.title.toLowerCase().includes(lowerQuery));
+            let matchIngredient = r.ingredients.some(ing => ing.toLowerCase().includes(lowerQuery));
+            if (mathName || matchIngredient) {
+                results.push(r);
+            }
+        }
+        return results;
+    }
+    getRecipeSortedByValue() {
+        let sortedList = this.getAllRecipes();
+        let n = sortedList.length;
+        for (let i = 0; i < n - 1; i++) {
+            let maxIndex = i;
+            for (let j = i + 1; j < n; j++) {
+                if (sortedList[j].value > sortedList[maxIndex].value) {
+                    maxIndex = j;
+                }
+            }
+            let temp = sortedList[maxIndex];
+            sortedList[maxIndex] = sortedList[i];
+            sortedList[i] = temp;
+        }
+        return sortedList;
+    }
+    // Add a parameter for the sort type
+    getFilteredRecipes(query, sortType) {
+        let list = this.searchRecipes(query);
+        if (sortType !== 'none') {
+            list = this.manualSortList(list, sortType);
+        }
+        return list;
+    }
+    manualSortList(list, criteria) {
+        let n = list.length;
+        for (let i = 0; i < n - 1; i++) {
+            for (let j = 0; j < n - i - 1; j++) {
+                let shouldSwap = false;
+                if (criteria === 'value') {
+                    // Sort by Price (High to Low)
+                    shouldSwap = list[j].value < list[j + 1].value;
+                }
+                else {
+                    // Sort by Title (A to Z)
+                    shouldSwap = list[j].title > list[j + 1].title;
+                }
+                if (shouldSwap) {
+                    let temp = list[j];
+                    list[j] = list[j + 1];
+                    list[j + 1] = temp;
+                }
+            }
+        }
+        return list;
     }
 }
 //# sourceMappingURL=RecipeManager.js.map

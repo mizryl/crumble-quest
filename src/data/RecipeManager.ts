@@ -19,7 +19,7 @@ export class RecipeManager {
                 { action: 'BAKE', item: 'batter', output: 'sponge-cake'},
             ],
             bakeTime: 5,
-            value: 50,
+            value: 40,
             spriteKey:'sponge-cake'
         });
 
@@ -33,7 +33,7 @@ export class RecipeManager {
                 { action: 'ADD', item: 'sponge-cake+chopped-fruit', output: 'fruit-cake'}
             ],
             bakeTime: 5,
-            value: 50,
+            value: 75,
             spriteKey:'fruit-cake'
         });
 
@@ -63,7 +63,7 @@ export class RecipeManager {
 
             ],
             bakeTime: 5,
-            value: 35,
+            value: 50,
             spriteKey: 'egg-toast'
         });
 
@@ -80,7 +80,7 @@ export class RecipeManager {
 
             ],
             bakeTime: 5,
-            value: 30,
+            value: 100,
             spriteKey: 'jam-toast'
         });
     }
@@ -127,25 +127,6 @@ export class RecipeManager {
 
     }
 
-    // getBakeResult(item: string): string {
-    //     if (item === 'dough') return 'bread';
-    //     if (item === 'batter') return 'sponge-cake';
-    //     return 'ruined-food';
-    // }
-
-    // getFryResult(item: string): string {
-    //     if (item === 'chopped-fruit') return 'jam';
-    //     if (item === 'egg') return 'fried-egg';
-    //     return 'ruined-food'; 
-    // }
-
-    // getToppingResult(item: string): string {
-    //     if (item === 'bread,egg') return 'egg-toast';
-    //     if (item === 'bread, jam') return 'jam-toast';
-    //     if (item === 'sponge-cake,chopped-fruit') return 'fruit-cake';
-    //     return 'ruined-food';
-    // }
-
     getResult(ingredients: string[], action: string): string {
         const inputStr = [...ingredients].sort().join('+');
 
@@ -186,4 +167,87 @@ export class RecipeManager {
         return this.itemSprites[itemkey] || null;
     }
 
+    public getValue(itemId: string): number {
+        const recipe = this.getRecipeById(itemId);
+
+        if (recipe) {
+            return recipe.value;
+        }
+
+        return 0;
+    }
+
+    public searchRecipes(query: string): Recipe[] {
+        const all = this.getAllRecipes();
+        if (!query || query.trim() === '') return all;
+
+        let results: Recipe[] = [];
+        let lowerQuery = query.toLowerCase();
+
+        for (let r of all) {
+            let mathName = (r.id.toLowerCase().includes(lowerQuery) || 
+                r.title.toLowerCase().includes(lowerQuery));
+            
+            let matchIngredient = r.ingredients.some(ing => ing.toLowerCase().includes(lowerQuery));
+        
+            if (mathName || matchIngredient) {
+                results.push(r);
+            }
+        }
+
+        return results;
+    }
+
+    public getRecipeSortedByValue(): Recipe[] {
+        let sortedList = this.getAllRecipes();
+        let n = sortedList.length;
+
+        for (let i = 0; i < n - 1; i++) {
+            let maxIndex = i;
+            for (let j = i + 1; j < n; j++) {
+                if (sortedList[j].value > sortedList[maxIndex].value) {
+                    maxIndex = j;
+                }
+            }
+            let temp = sortedList[maxIndex];
+            sortedList[maxIndex] = sortedList[i];
+            sortedList[i] = temp;
+        }
+        return sortedList;
+    }
+
+    // Add a parameter for the sort type
+public getFilteredRecipes(query: string, sortType: 'value' | 'title' | 'none'): Recipe[] {
+    let list = this.searchRecipes(query);
+    
+    if (sortType !== 'none') {
+        list = this.manualSortList(list, sortType);
+    }
+    
+    return list;
+}
+
+    public manualSortList(list: Recipe[], criteria: 'value' | 'title'): Recipe[] {
+        let n = list.length;
+        for (let i = 0; i < n - 1; i++) {
+            for (let j = 0; j < n - i - 1; j++) {
+                
+                let shouldSwap = false;
+                if (criteria === 'value') {
+                    // Sort by Price (High to Low)
+                    shouldSwap = list[j].value < list[j + 1].value;
+                } else {
+                    // Sort by Title (A to Z)
+                    shouldSwap = list[j].title > list[j + 1].title;
+                }
+    
+                if (shouldSwap) {
+                    let temp = list[j];
+                    list[j] = list[j + 1];
+                    list[j + 1] = temp;
+                }
+            }
+        }
+        return list;
+    }
 }

@@ -6,6 +6,11 @@ export class KeyHandler {
     public rightPressed: boolean = false;
     public interactPressed: boolean = false;
     public processPressed: boolean = false;
+    public pausePressed: boolean = false;
+
+    public backspacePressed: boolean = false;
+    private backspaceTimer: number = 0;
+    private readonly backspaceDelay: number = 100;
 
     handlePressed(k: string): void {
         let keyLower = k.toLowerCase();
@@ -28,13 +33,15 @@ export class KeyHandler {
         if (keyLower === 'f') this.processPressed = false;
     }
 
-    // public consumeInteract(): boolean {
-    //     if (this.interactPressed) {
-    //         this.interactPressed = false;
-    //         return true; //tells the game the player has interacted
-    //     }
-    //     return false; //tell the game, nothing to do here
-    // }
+    public handleSearchBackspace(currentQuery: string): string {
+        if (this.backspacePressed) {
+            if (millis() - this.backspaceTimer > this.backspaceDelay) {
+                this.backspaceTimer = millis();
+                return currentQuery.slice(0, -1);
+            }
+        }
+        return currentQuery;
+    }
     
 
 

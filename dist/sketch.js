@@ -11,6 +11,7 @@ import { CheckoutCounter } from './src/stations/CheckoutStation.js';
 import { Trash } from './src/stations/Trash.js';
 import { RecipeManager } from './src/data/RecipeManager.js';
 import { Customer } from './src/entities/Customer.js';
+import { HUD } from './src/ui/HUD.js';
 //start screen 
 let startBtn;
 let loadBtn;
@@ -23,6 +24,7 @@ let playerSprites = { up: [], down: [], left: [], right: [] };
 let stations = [];
 let frontStations = [];
 let stationSprites = {};
+//customer
 export let customer = [];
 let spawnTimer = 0;
 const SPAWN_INTERVAL = 5000;
@@ -35,8 +37,15 @@ const customerSprites = {
 let player;
 let keyH;
 let recipeManager;
+let hud;
 let gameState;
 let dayCount = 0;
+//recipe book 
+let searchQuery = '';
+let scrollY = 0; // Current scroll position of the list
+let lastBackspaceTime = 0;
+const BACKSPACE_DELAY = 100;
+const maxQueryLength = 30;
 function preload() {
     //tiles
     font = loadFont('assets/fonts/PixelCode-Bold.ttf');
@@ -80,35 +89,37 @@ function setup() {
     //homescreen
     startBtn = new RollingPinButton(tileM.worldWidth / 2, tileM.worldHeight / 2, "NEW GAME");
     loadBtn = new RollingPinButton(tileM.worldWidth / 2, tileM.worldHeight / 2 + 100, "LOAD GAME");
-    gameState = "START";
+    gameState = "PLAYING";
     textFont(font);
     textAlign(CENTER, CENTER);
     console.log("Game initialized in START state");
     //Game-related
-    keyH = new KeyHandler();
-    player = new Player(5, 2, playerSprites, keyH);
     recipeManager = new RecipeManager();
-    // console.log("Flour sprite status:", stationSprites['flour']);
-    //stations
-    stations.push(new Crates(3, 1.5, stationSprites['flour'], 'flour'));
-    stations.push(new Crates(4, 1.5, stationSprites['eggs'], 'egg'));
-    stations.push(new Crates(5, 1.5, stationSprites['fruit'], 'fruit'));
-    stations.push(new Oven(10, 1.5, stationSprites['oven'], recipeManager, 1));
-    stations.push(new Oven(12, 1.5, stationSprites['oven'], recipeManager, 1));
-    stations.push(new PrepTable(7, 1.5, stationSprites['prep'], recipeManager, 2));
-    stations.push(new PrepTable(8, 1.5, stationSprites['prep'], recipeManager, 2));
-    stations.push(new Trash(1, 1.5, stationSprites['trash']));
-    frontStations.push(new PickupCounter(8, 4.5, stationSprites['pickup-left'], recipeManager));
-    frontStations.push(new PickupCounter(9, 4.5, stationSprites['pickup-right'], recipeManager));
-    frontStations.push(new PickupCounter(10, 4.5, stationSprites['pickup-left'], recipeManager));
-    frontStations.push(new PickupCounter(11, 4.5, stationSprites['pickup-right'], recipeManager));
-    frontStations.push(new PickupCounter(12, 4.5, stationSprites['pickup-left'], recipeManager));
-    frontStations.push(new PickupCounter(13, 4.5, stationSprites['pickup-right'], recipeManager));
-    frontStations.push(new PickupCounter(14, 4.5, stationSprites['pickup-left'], recipeManager));
-    frontStations.push(new DisplayCounter(0, 3.5, stationSprites['display']));
-    frontStations.push(new DisplayCounter(2, 3.5, stationSprites['display']));
-    frontStations.push(new DisplayCounter(6, 3.5, stationSprites['display']));
-    frontStations.push(new CheckoutCounter(4, 4.5, stationSprites['checkout']));
+    keyH = new KeyHandler();
+    player = new Player(5, 2, playerSprites, keyH, recipeManager);
+    hud = new HUD();
+    stations.push(new Crates(6, 2.5, stationSprites['flour'], 'flour'));
+    stations.push(new Crates(7, 2.5, stationSprites['eggs'], 'egg'));
+    stations.push(new Crates(8, 2.5, stationSprites['fruit'], 'fruit'));
+    stations.push(new Oven(3, 2.5, stationSprites['oven'], recipeManager, 1));
+    stations.push(new Oven(11, 2.5, stationSprites['oven'], recipeManager, 1));
+    stations.push(new Oven(12, 2.5, stationSprites['oven'], recipeManager, 1));
+    stations.push(new PrepTable(2, 2.5, stationSprites['prep'], recipeManager, 2));
+    stations.push(new PrepTable(4, 2.5, stationSprites['prep'], recipeManager, 2));
+    stations.push(new PrepTable(10, 2.5, stationSprites['prep'], recipeManager, 2));
+    stations.push(new PrepTable(13, 2.5, stationSprites['prep'], recipeManager, 2));
+    stations.push(new Trash(0, 2.5, stationSprites['trash']));
+    frontStations.push(new PickupCounter(8, 5.5, stationSprites['pickup-left'], recipeManager));
+    frontStations.push(new PickupCounter(9, 5.5, stationSprites['pickup-right'], recipeManager));
+    frontStations.push(new PickupCounter(10, 5.5, stationSprites['pickup-left'], recipeManager));
+    frontStations.push(new PickupCounter(11, 5.5, stationSprites['pickup-right'], recipeManager));
+    frontStations.push(new PickupCounter(12, 5.5, stationSprites['pickup-left'], recipeManager));
+    frontStations.push(new PickupCounter(13, 5.5, stationSprites['pickup-right'], recipeManager));
+    frontStations.push(new PickupCounter(14, 5.5, stationSprites['pickup-left'], recipeManager));
+    frontStations.push(new DisplayCounter(0, 4.5, stationSprites['display']));
+    frontStations.push(new DisplayCounter(2, 4.5, stationSprites['display']));
+    frontStations.push(new DisplayCounter(6, 4.5, stationSprites['display']));
+    frontStations.push(new CheckoutCounter(4, 5.5, stationSprites['checkout']));
     //food
     recipeManager.registerSprite('sponge-cake', loadImage('assets/img/food/sponge-cake.png'));
     recipeManager.registerSprite('fruit-cake', loadImage('assets/img/food/fruit-cake.png'));
@@ -116,8 +127,15 @@ function setup() {
     recipeManager.registerSprite('egg-toast', loadImage('assets/img/food/egg-toast.png'));
     recipeManager.registerSprite('jam-toast', loadImage('assets/img/food/jam-toast.png'));
     recipeManager.registerSprite('ruined-food', loadImage('assets/img/food/ruined-food.png'));
-    // console.log("Recipes Loaded:", recipeManager.getAllRecipes().length);
-    // console.log("Customer Sprites Loaded:", Object.keys(customerSprites).length);
+    //ingredients
+    recipeManager.registerSprite('flour', loadImage('assets/img/food/flour.png'));
+    recipeManager.registerSprite('dough', loadImage('assets/img/food/dough.png'));
+    recipeManager.registerSprite('batter', loadImage('assets/img/food/batter.png'));
+    recipeManager.registerSprite('egg', loadImage('assets/img/food/egg.png'));
+    recipeManager.registerSprite('fried-egg', loadImage('assets/img/food/fried-egg.png'));
+    recipeManager.registerSprite('fruit', loadImage('assets/img/food/fruit.png'));
+    recipeManager.registerSprite('chopped-fruit', loadImage('assets/img/food/chopped-fruit.png'));
+    recipeManager.registerSprite('jam', loadImage('assets/img/food/jam.png'));
 }
 function draw() {
     background(235, 226, 214);
@@ -127,8 +145,19 @@ function draw() {
             break;
         case "PLAYING":
             drawGameWorld();
+            hud.updateTime(deltaTime / 1000);
+            break;
+        case "PAUSED":
+            drawGameWorld();
+            if (keyIsDown(BACKSPACE)) { // BACKSPACE is a p5 constant (8)
+                if (millis() - lastBackspaceTime > BACKSPACE_DELAY) {
+                    searchQuery = searchQuery.slice(0, -1);
+                    lastBackspaceTime = millis();
+                }
+            }
             break;
         case "RESULTS":
+            drawGameWorld();
             drawResults();
             break;
     }
@@ -161,34 +190,40 @@ function drawGameWorld() {
     const dt = deltaTime / 1000;
     const allStations = [...stations, ...frontStations];
     tileM.display();
-    text("test", tileM.worldWidth / 2, tileM.worldHeight / 2);
-    for (let s of stations) {
+    for (let s of stations)
         s.display();
-        if (s instanceof Oven) {
-            s.update(dt);
-        }
-    }
-    if (player) {
-        player.update(tileM, allStations);
+    if (player)
         player.display();
-    }
-    for (let s of frontStations) {
+    for (let s of frontStations)
         s.display();
-    }
     for (let s of stations) {
         if (s instanceof Oven || s instanceof PrepTable) {
             s.drawInterface();
         }
     }
-    // console.log("Active Customers:", customer.length);
-    manageCustomer(dt);
-    // for (let c of customer) {
-    //   c.update(tileM, frontStations);
-    // }
+    //timer
+    const timer = hud.getTimer();
+    hud.displayScore(20, 20, 150, 40);
+    hud.displayTimer(tileM.worldWidth - 60, 40, 70);
+    if (gameState === 'PLAYING') {
+        spawnTimer += dt;
+        if (player)
+            player.update(tileM, allStations);
+        manageCustomer(dt);
+        for (let s of stations) {
+            if (s instanceof Oven)
+                s.update(dt);
+        }
+        if (timer <= 0) {
+            gameState = 'RESULTS';
+        }
+    }
+    else if (gameState === 'PAUSED') {
+        drawPausedOverlay();
+    }
 }
 function manageCustomer(dt) {
     spawnTimer += deltaTime;
-    // Change the condition to allow more than one customer (e.g., max 5)
     if (customer.length < 5 && spawnTimer > SPAWN_INTERVAL) {
         const spriteKeys = Object.keys(customerSprites);
         const randomKey = random(spriteKeys);
@@ -198,8 +233,8 @@ function manageCustomer(dt) {
             const randomRecipe = random(allRecipes);
             //vertical line queue
             const queueX = 5;
-            const queueY = 4 + (customer.length * 1);
-            const c = new Customer(-1, 8, selectedSprites, randomRecipe.id, queueX, queueY, recipeManager);
+            const queueY = 5 + (customer.length * 1);
+            const c = new Customer(-1, 8, selectedSprites, randomRecipe.id, queueX, queueY, recipeManager, hud);
             customer.push(c);
             refreshQueue();
             spawnTimer = 0;
@@ -209,16 +244,154 @@ function manageCustomer(dt) {
         c.update(tileM, frontStations);
         c.display();
     }
+    //removes customer
+    customer = customer.filter(c => {
+        if (c.state === 'LEAVING' && c.isAtDestination()) {
+            return false;
+        }
+        return true;
+    });
 }
 export function refreshQueue() {
     const waitingArea = customer.filter(c => c.state === 'WALK-IN' || c.state === 'WAITING');
     waitingArea.forEach((c, index) => {
         const queueX = 5;
-        const queueY = 4 + index;
+        const queueY = 5 + index;
         c.setTarget(queueX, queueY);
     });
 }
+function drawPausedOverlay() {
+    push();
+    //Book Background
+    translate(width / 2, height / 2);
+    fill(250, 243, 217);
+    stroke(77, 61, 47);
+    strokeWeight(4);
+    rectMode(CENTER);
+    rect(0, 0, 500, 580, 10);
+    //Title & Search Info
+    fill(77, 61, 47);
+    noStroke();
+    textAlign(CENTER);
+    textSize(24);
+    text("RECIPE BOOK", 0, -240);
+    textSize(14);
+    textAlign(LEFT, CENTER);
+    text("Searching: " + searchQuery + (frameCount % 60 < 30 ? "|" : ""), -200, -195);
+    let recipes = recipeManager.getFilteredRecipes(searchQuery, 'title');
+    // Dimensions (Scroll)
+    let cardHeight = 140;
+    let spacing = 145;
+    let viewTop = -180;
+    let viewBottom = 260;
+    let viewHeight = viewBottom - viewTop;
+    // Scrollbar
+    let totalListHeight = recipes.length * spacing;
+    let trackHeight = 280;
+    let trackX = 235; // Right edge of the book
+    let trackY = 40;
+    if (totalListHeight > viewHeight) {
+        // Draw Track
+        fill(200, 190, 160, 150);
+        noStroke();
+        rect(trackX, trackY, 10, trackHeight, 5);
+        // Calculate Handle
+        // handleHeight represents the visible portion of the list
+        let handleHeight = constrain(map(viewHeight, totalListHeight, totalListHeight + viewHeight, trackHeight - 200, 30), 30, trackHeight);
+        // scrollPos maps how far we've scrolled to the track length
+        let scrollPos = map(scrollY, 0, max(1, totalListHeight - viewHeight), 0, trackHeight - handleHeight);
+        // Draw Handle
+        fill(77, 61, 47);
+        rect(trackX, -125 + scrollPos + handleHeight / 2, 12, handleHeight, 5);
+    }
+    // 3. DRAW RECIPES
+    push();
+    for (let i = 0; i < recipes.length; i++) {
+        let r = recipes[i];
+        // Calculate yPos based on index, spacing, and scrollY
+        let yPos = viewTop + (i * spacing) - scrollY + 80;
+        //Only draw if the card is visible within the book "window"
+        if (yPos > viewTop + 70 && yPos < viewBottom - 60) {
+            push();
+            translate(0, yPos);
+            //Card Background
+            fill(255, 255, 255, 200);
+            noStroke();
+            rectMode(CENTER);
+            rect(0, 0, 440, cardHeight, 8);
+            //photo (left side)
+            let sprite = recipeManager.getSprite(r.spriteKey);
+            if (sprite) {
+                imageMode(CENTER);
+                image(sprite, -180, -15, 60, 60);
+            }
+            //Title & Price
+            fill(77, 61, 47);
+            textAlign(LEFT, TOP);
+            textSize(18);
+            text(r.title.toUpperCase(), -140, -45);
+            textAlign(RIGHT, TOP);
+            text(`$${r.value}`, 200, -45);
+            //Ingredients
+            textSize(10);
+            fill(120, 100, 80);
+            textAlign(LEFT, TOP);
+            text("INGREDIENTS: " + r.ingredients.join(", "), -140, -20);
+            //draw recipe steps
+            stroke(77, 61, 47, 40);
+            line(-140, -3, 200, -3);
+            noStroke();
+            textSize(9);
+            for (let s = 0; s < r.steps.length; s++) {
+                let step = r.steps[s];
+                let stepY = 5 + (s * 11);
+                const cleanOutput = step.output.replace('-', ' ');
+                const cleanItem = step.item.replace('-', ' ');
+                fill(77, 61, 47);
+                text(`• ${step.action}: ${cleanItem} ➔ ${cleanOutput}`, -140, stepY);
+            }
+            pop();
+        }
+    }
+    pop();
+    pop();
+}
 function drawResults() {
+    push();
+    translate(width / 2, height / 2);
+    fill(255, 240);
+    // stroke(77, 61, 47);
+    // strokeWeight(4);
+    noStroke();
+    rectMode(CENTER);
+    rect(0, 0, 500, 580, 2);
+    textSize(32);
+    textAlign(CENTER);
+    fill(0);
+    text(`Day ${hud.getDayCount()} Complete!`, 0, -240);
+    textAlign(LEFT, CENTER);
+    fill(87, 78, 62);
+    textSize(24);
+    text(`Total Earned: `, -220, -180);
+    text(`Guest Served: `, -220, -140);
+    text(`Most Baked Item: `, -220, -100);
+    push();
+    textAlign(RIGHT, CENTER);
+    translate(220, -180);
+    text('500', 0, 0);
+    text('8/10', 0, 40);
+    text('bread', 0, 80);
+    pop();
+    pop();
+}
+function mouseWheel(event) {
+    if (gameState === "PAUSED") {
+        scrollY += event.delta;
+        let recipesToShow = recipeManager.getFilteredRecipes(searchQuery, 'title');
+        //use space and approx height of the recipe book
+        let maxScroll = max(0, (recipesToShow.length * 145) - 360);
+        scrollY = constrain(scrollY, 0, maxScroll);
+    }
 }
 function drawCloudBorder() {
     fill(255, 255, 255, 200);
@@ -236,6 +409,25 @@ function startGame() {
     gameState = "PLAYING";
 }
 function keyPressed() {
+    if (keyCode === ESCAPE) {
+        if (gameState === 'PLAYING') {
+            gameState = 'PAUSED';
+        }
+        else if (gameState === 'PAUSED') {
+            gameState = 'PLAYING';
+            console.log('Game Resumed');
+        }
+        return false;
+    }
+    if (gameState === 'PAUSED') {
+        if (keyCode === BACKSPACE) {
+            searchQuery = searchQuery.slice(0, -1);
+        }
+        //clears search with enter
+        if (keyCode === ENTER) {
+            searchQuery = "";
+        }
+    }
     if (gameState == "PLAYING") {
         player.keyH.handlePressed(key);
     }
@@ -245,10 +437,21 @@ function keyReleased() {
         player.keyH.handleReleased(key);
     }
 }
+function keyTyped() {
+    if (gameState === 'PAUSED') {
+        if (searchQuery.length < maxQueryLength) {
+            if (key.length === 1) {
+                searchQuery += key;
+            }
+        }
+    }
+}
 window.preload = preload;
 window.setup = setup;
 window.draw = draw;
 window.mousePressed = mousePressed;
 window.keyPressed = keyPressed;
 window.keyReleased = keyReleased;
+window.mouseWheel = mouseWheel;
+window.keyTyped = keyTyped;
 //# sourceMappingURL=sketch.js.map

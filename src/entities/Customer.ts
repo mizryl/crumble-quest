@@ -3,34 +3,34 @@ import { BaseStation } from "../stations/BaseStation.js";
 import { TileManager } from "../world/TileManager.js";
 import { RecipeManager } from "../data/RecipeManager.js";
 import { PickupCounter } from "../stations/PickupCounter.js";
-import { refreshQueue } from "../../sketch.js";
+import { HUD } from "../ui/HUD.js";
 
 
 export class Customer extends Entity {
-    public state: 'WALK-IN' | 'WAITING' | 'ORDERED' | 'WAITING_FOR_FOOD' | 'LEAVING' = 'WALK-IN';
+    public state: 'WALK-IN' | 'WAITING' | 'ORDERED' | 'WAITING_FOR_FOOD' | 'PICKUP_FOOD' | 'LEAVING' = 'WALK-IN';
     public recipeName: string;
     public orderTaken: boolean = false;
     private targetX: number;
     private targetY: number;
     private hasSetWaitingSpot: boolean = false;
     private slot: any = null;
+    private targetCounter : any;
 
     private static waitingSlots = [
-        {x: 8, y: 6, occupied: false},
-        {x: 9, y: 6, occupied: false},
-        {x: 10, y: 6, occupied: false},
-        {x: 11, y: 6, occupied: false},
-        {x: 12, y: 6, occupied: false},
-        {x: 13, y: 6, occupied: false},
+        {x: 8, y: 7, occupied: false},
+        {x: 9, y: 7, occupied: false},
+        {x: 10, y: 7, occupied: false},
+        {x: 11, y: 7, occupied: false},
+        {x: 12, y: 7, occupied: false},
+        {x: 13, y: 7, occupied: false},
         
     ];
 
     recipeManager: RecipeManager;
-    
-    
+    hud: HUD;
     
     constructor(x: number, y: number, sprites: any, recipe: string, 
-                targetX: number, targetY: number, recipeManager: RecipeManager) {
+                targetX: number, targetY: number, recipeManager: RecipeManager, hud: HUD) {
         super(x, y, true, 0.05, sprites);     
         
         this.targetX = targetX;
@@ -38,6 +38,7 @@ export class Customer extends Entity {
         this.recipeName = recipe;
         this.currentAnimation = this.right;
         this.recipeManager = recipeManager;
+        this.hud = hud;
     }
 
     override display() {
@@ -80,6 +81,14 @@ export class Customer extends Entity {
         if (this.state === 'ORDERED' && this.orderTaken && !this.hasSetWaitingSpot) {
             this.prepareWaitingSlot();
         }
+        //scan for food
+        if (this.state === 'WAITING_FOR_FOOD') {
+            this.checkForOrder(stations);
+        }
+        //go to pickup counter
+        if (this.state === 'PICKUP_FOOD' && this.isAtDestination()) {
+            this.finalizePickup();
+        }
         
         if (this.isMoving) {
             this.animate();
@@ -118,8 +127,6 @@ export class Customer extends Entity {
             //bubble bkg
             push();
             fill(255);
-            // stroke(50);
-            // strokeWeight(2);
             noStroke();
             rect(bx + 5, by, bubbleW, bubbleH, 10);
     
@@ -180,13 +187,47 @@ export class Customer extends Entity {
 
     }
 
+    public checkForOrder(stations: BaseStation[]): void {
+        for (let station of stations) {
+            if (station instanceof PickupCounter) {
+                if (station.contents.includes(this.recipeName) && !station.isClaimed) {
+                    station.isClaimed = true;
+                    this.targetCounter = station;
+                    this.setTarget(station.x, station.y);
+                    this.state = 'PICKUP_FOOD';
+                    this.isMoving = true;
+                    this.hasSetWaitingSpot = false;
+                    break; //stops looking after finding one
+                }
+            }
+        }
+    }
+
+    public finalizePickup(): void {
+        if (this.targetCounter) {
+            this.targetCounter.contents = [];
+            this.targetCounter.isClaimed = false;
+        }
+
+        const payment = this.recipeManager.getValue(this.recipeName);
+
+        if (this.hud) {
+            this.hud.addScore(payment);
+        }
+        
+
+        this.leave();
+
+    }
+
     public leave() {
         if (this.slot) {
             this.slot.occupied = false;
             this.slot = null;
         }
         this.state = 'LEAVING';
-        this.setTarget(-5, 8);
+        this.setTarget(this.x, 10);
+        this.isMoving = true;
     }
 
     public setTarget(tx: number, ty: number) {

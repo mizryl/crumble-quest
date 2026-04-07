@@ -5,7 +5,7 @@ import { TileManager } from "../world/TileManager.js";
 
 export abstract class ProcessingStation extends BaseStation {
 
-    public processingTime: number = 3;
+    public processingTime: number = 1;
     public currentProgress: number = 0;
     public isFinished: boolean = false;
     public isProcessing: boolean = false;
@@ -29,28 +29,14 @@ export abstract class ProcessingStation extends BaseStation {
     }
 
     public drawInterface(): void {
-        this. drawContents();
+        // this. drawContents();
         if (this.processingTime > 0 && this.isProcessing) {
             this.drawProgressBar();
         }
     }
 
-    private drawContents(): void {
-        if (this.contents.length === 0) return;
-        this.contents.forEach((itemName, index) => {
-            let offsetX = this.x * TileManager.TILE_SIZE + 5;
-            let offsetY = this.y + 32 + (index * 12);
-
-            fill(255);
-            noStroke();
-            textSize(10);
-            textAlign(LEFT);
-            text(itemName, offsetX, offsetY - 10);
-        });
-    }
-
     protected drawProgressBar(): void {
-        const barW = 20;
+        const barW = 60;
         const barH = 8;
         const barX = this.x * TileManager.TILE_SIZE + 2;
         const barY = this.y * TileManager.TILE_SIZE + 10;
@@ -99,7 +85,6 @@ export abstract class ProcessingStation extends BaseStation {
     }
 
     override interact(player: Player): void {
-        // if (this.isProcessing && !player.heldItem) return; //can't touch it while prepping
 
         //DEPOSIT
         if (player.heldItem && this.contents.length < this.maxItem) {
@@ -117,19 +102,16 @@ export abstract class ProcessingStation extends BaseStation {
             if (this.isFinished) {
                 player.heldItem = this.getTransformedItem();
                 console.log(`You picked-up: ${player.heldItem}`)
-                // this.isFinished = false;
-                // this.currentProgress = 0;
                 this.contents = []; //clears table
-            this.isFinished = false;
-            this.isProcessing = false;
-            this.currentProgress = 0;
+                this.isFinished = false;
+                this.isProcessing = false;
+                this.currentProgress = 0;
             } else {
-                // player.heldItem = this.contents.join('+');
-                // console.log('pickup: ' + this.contents.join('+'));
                 player.heldItem = this.contents.pop() || null;
                 if (this.contents.length === 0) {
                     this.isProcessing = false;
                     this.currentProgress = 0;
+                    return;
                 }
             }
 
@@ -137,10 +119,6 @@ export abstract class ProcessingStation extends BaseStation {
                 this.isProcessing = false;
                 this.currentProgress = 0;
             }
-            // this.contents = []; //clears table
-            // this.isFinished = false;
-            // this.isProcessing = false;
-            // this.currentProgress = 0;
         }
         
     }
@@ -158,8 +136,4 @@ export abstract class ProcessingStation extends BaseStation {
             this.finishProcessing();
         }
     }
-
-    // protected getTransformedItem(): string {
-    //     return this.contents[0];
-    // }
 }
