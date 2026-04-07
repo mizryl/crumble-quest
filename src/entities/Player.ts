@@ -22,7 +22,7 @@ export class Player extends Entity {
     
 
     constructor (x: number, y: number, sprites: any, keyH: KeyHandler, recipeManager: RecipeManager) {
-        super(x, y, false, 0.06, sprites);
+        super(x, y, false, 0.06, sprites, "Player");
         this.keyH = keyH;        
         this.currentAnimation = this.down;
         this.recipeManager = recipeManager;
@@ -130,6 +130,7 @@ export class Player extends Entity {
         
 
         this.checkStationProximity(stations);
+        this.recordMovement();
 
     }
 
@@ -197,8 +198,6 @@ export class Player extends Entity {
                 targetStation.stopProcessing();
             }
             
-            // Note: We don't call anything for Oven here because the 
-            // Oven's own update() method handles its progress!
         }
 
     }

@@ -9,20 +9,6 @@ export class Oven extends ProcessingStation {
         if (this.contents.length > 0) {
             const itemName = this.contents[0];
             const img = this.recipeManager.getSprite(itemName);
-            // const size = TileManager.TILE_SIZE;
-            // let px = this.x * size;
-            // let py = this.y * size;
-            //     if (img) {
-            //         push();
-            //         fill(255, 255, 255, 75);
-            //         image(img, px + size/4, py - 20, size/2, size/2);
-            //         pop();
-            //     } else {
-            //         fill(77, 61, 47); 
-            //         textSize(5);
-            //         text(itemName, px + px/2, this.y);
-            //     }
-            // }
             const size = TileManager.TILE_SIZE;
             //bubble position
             const bx = this.x * size;

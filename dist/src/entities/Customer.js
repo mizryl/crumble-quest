@@ -3,7 +3,7 @@ import { TileManager } from "../world/TileManager.js";
 import { PickupCounter } from "../stations/PickupCounter.js";
 export class Customer extends Entity {
     constructor(x, y, sprites, recipe, targetX, targetY, recipeManager, hud, mood) {
-        super(x, y, true, 0.05, sprites);
+        super(x, y, true, 0.05, sprites, "Customer");
         this.state = 'WALK-IN';
         this.orderTaken = false;
         this.hasSetWaitingSpot = false;
@@ -25,6 +25,8 @@ export class Customer extends Entity {
         }
         if (this.state === "WAITING" || this.state === "WAITING_FOR_FOOD") {
         }
+        // this.displayPatienceIcon();
+        this.drawPatienceBar();
         this.displayPatienceIcon();
     }
     update(tileM, stations) {
@@ -79,6 +81,7 @@ export class Customer extends Entity {
             this.currentFrame = 0;
             this.currentAnimation = this.up;
         }
+        this.recordMovement();
     }
     animate() {
         if (!this.isMoving) {
@@ -214,17 +217,39 @@ export class Customer extends Entity {
         if (img) {
             imageMode(CENTER);
             const bob = Math.sin(frameCount * 0.1) * 2;
-            image(img, this.x * size + (size / 2), this.y * size + size + 5 + bob, 16, 16);
+            image(img, this.x * size + (size / 2) - 14, this.y * size - size / 16 + 5 + bob, 16, 16);
         }
         pop();
     }
-    getMoodColour() {
-        const percent = (this.patience / this.maxPatience) * 100;
-        if (percent > 60)
-            return color(0, 255, 0); // Happy (Green)
-        if (percent > 30)
-            return color(255, 255, 0); // Neutral (Yellow)
-        return color(255, 0, 0); // Angry (Red)
+    drawPatienceBar() {
+        if (this.state !== 'WAITING' && this.state !== 'WAITING_FOR_FOOD' && this.state !== 'ORDERED') {
+            return;
+        }
+        const size = TileManager.TILE_SIZE;
+        const totalBarWidth = 34;
+        const barHeight = 6;
+        const screenX = this.x * size + (size / 2) + 10;
+        const screenY = this.y * size;
+        push();
+        rectMode(CENTER);
+        // Background (The white bar)
+        noStroke();
+        fill(255, 255, 255, 180);
+        rect(screenX, screenY + 5, totalBarWidth, barHeight, 2);
+        // Calculate Fill
+        const fillPercent = constrain(this.patience / this.maxPatience, 0, 1);
+        const currentFillWidth = fillPercent * totalBarWidth;
+        if (this.patience > this.maxPatience * 0.6)
+            fill(46, 204, 113);
+        else if (this.patience > this.maxPatience * 0.3)
+            fill(241, 196, 15);
+        else
+            fill(frameCount % 20 < 10 ? 255 : 150, 50, 50);
+        // Draw the actual progress
+        const leftEdge = screenX - (totalBarWidth / 2);
+        const fillX = leftEdge + (currentFillWidth / 2);
+        rect(fillX, screenY + 5, currentFillWidth, barHeight, 2);
+        pop();
     }
     setTarget(tx, ty) {
         this.targetX = tx;

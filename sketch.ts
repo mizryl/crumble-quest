@@ -19,11 +19,16 @@ import { HUD } from './src/ui/HUD.js';
 import { ProcessingStation } from './src/stations/ProcessingStation.js';
 import { Button } from './src/ui/Button.js';
 
+import { MovementLogger } from './src/data/MovementLogger.js';
+
 //btns
 let startBtn: RollingPinButton;
 let loadBtn: RollingPinButton;
+let tutorialBtn: RollingPinButton;
 let nextDayBtn: RollingPinButton;
 let returnBtn: Button;
+let downloadBtn: Button;
+
 
 
 let font: any;
@@ -61,7 +66,7 @@ let keyH: KeyHandler;
 let recipeManager: RecipeManager;
 let hud: HUD;
 
-let gameState: "START" | "PLAYING" | "RESULTS" | "PAUSED";
+let gameState: "START" | "TUTORIAL" | "PLAYING" | "RESULTS" | "PAUSED";
 let dayCount = 0;
 
 //recipe book 
@@ -72,6 +77,11 @@ let lastBackspaceTime = 0;
 const BACKSPACE_DELAY = 100;
 const maxQueryLength: number = 30;
 
+// tutorial
+let tutorialPage = 0;
+const MAX_TUTORIAL_PAGES = 4; 
+
+let isDownloading = false;
 
 
 function preload(): void {
@@ -129,13 +139,15 @@ function setup(): void {
   //btns
   startBtn = new RollingPinButton(tileM.worldWidth / 2, tileM.worldHeight / 2, "NEW GAME");
   loadBtn = new RollingPinButton(tileM.worldWidth / 2, tileM.worldHeight / 2 + 100, "LOAD GAME");
+  tutorialBtn = new RollingPinButton(width/2, height/2 + 200, "HOW TO PLAY");
   nextDayBtn = new RollingPinButton(width/2, height/2 + 150, "START NEXT DAY");
   returnBtn = new Button(width/2, height/2 + 210, 220, 40, "Return to Title Screen");
+  downloadBtn = new Button(width/2, height/2 + 250, 200, 30, "Download Movement Log");
 
 
 
 
-  gameState = "RESULTS";
+  gameState = "START";
 
   textFont(font);
   textAlign(CENTER, CENTER);
@@ -195,6 +207,10 @@ function draw(): void {
     case "START":
       drawMainMenu();
       break;
+    case "TUTORIAL":
+      drawMainMenu();
+      drawTutorialOverlay();
+      break;
     case "PLAYING":
       drawGameWorld();
       hud.updateTime(deltaTime / 1000);
@@ -220,27 +236,61 @@ function draw(): void {
 function mousePressed(): void {
   switch (gameState) {
     case "START":
-      if (startBtn && startBtn.isClicked()) {
-        startGame();
-      }
+      
+      if (startBtn && startBtn.isClicked()) startGame();
+      if (loadBtn && loadBtn.isClicked()) loadGame();
+      if (tutorialBtn.isClicked()) { 
 
-      if (loadBtn.isClicked()) {
-        loadGame();
+        drawTutorialOverlay();
+    }
+      
+      break;
+
+    case "TUTORIAL": 
+      drawTutorialOverlay();
+      tutorialPage++;
+
+      if (tutorialPage > MAX_TUTORIAL_PAGES) {
+        tutorialPage = 0; // reset for next time
+        gameState = "START"; // Go back to menu
       }
       break;
+
     case "PLAYING":
         if (player.currentTargetStation) {
             player.currentTargetStation.interact(player);
         }
       break;
+
     case "RESULTS":
-       saveGame();
+      saveGame(); //save automatically
+
       if (nextDayBtn && nextDayBtn.isClicked()) {
         startNextDay();
       }
 
       if (returnBtn && returnBtn.isClicked()) {
         gameState = "START";
+        return;
+      }
+
+      if (downloadBtn.isClicked() && !isDownloading) {
+        isDownloading = true; // Lock it
+        
+        // Create a clean, shallow copy of the entities
+        const currentCustomers = [...customer]; 
+        const allMovers = [player, ...currentCustomers];
+    
+        console.log(`Exporting report for ${allMovers.length} entities...`);
+        
+        try {
+          MovementLogger.exportReport(allMovers);
+        } catch (err) {
+          console.error("Download failed:", err);
+        } finally {
+          // Small delay before allowing another download to prevent spam
+          setTimeout(() => { isDownloading = false; }, 1000);
+        }
       }
       break;
   }
@@ -260,7 +310,343 @@ function drawMainMenu(): void {
 
   startBtn.display();
   loadBtn.display();
+  tutorialBtn.display();
+  // if (tutorialBtn && tutorialBtn.isClicked()) {
+  //   gameState = 'TUTORIAL';
+  // }
 }
+
+function drawTutorialOverlay(): void {
+  gameState = "TUTORIAL";
+  push();
+  // Semi-transparent background
+  fill(0, 0, 0, 200);
+  rect(0, 0, width, height);
+
+  // Main UI Panel
+  translate(width/2, height/2);
+  fill(250, 243, 217);
+  stroke(77, 61, 47);
+  strokeWeight(4);
+  rectMode(CENTER);
+  rect(0, 0, 500, 580, 15);
+
+  fill(77, 61, 47);
+  noStroke();
+  textAlign(CENTER);
+  textSize(32);
+  text("HOW TO PLAY", 0, -240);
+
+  // Page Content
+  switch(tutorialPage) {
+    case 0:
+      drawMovementTutorial();
+      break;
+    case 1:
+      drawCookingTutorial();
+      break;
+    case 2: 
+      drawRecipeTutorial(); 
+      break;
+    case 3:
+      drawInteractionTutorial();
+      break;
+    case 4:
+      drawServingTutorial();
+      break;
+  }
+
+
+  // footer
+  textSize(16);
+  fill(77, 61, 47, 150);
+  text(`Page ${tutorialPage + 1} of ${MAX_TUTORIAL_PAGES + 1}`, 0, 230);
+  textSize(14);
+  text("Click anywhere to continue", 0, 260);
+  
+  pop();
+}
+
+function drawMovementTutorial() {
+  push();
+  textSize(24);
+  text("MOVEMENT", 0, -100);
+
+  const keySize = 50;
+  const spacing = 5;
+  const totalSize = keySize + spacing;
+
+  const keys = [
+    ["W", 0, -totalSize],      // Top
+    ["A", -totalSize, 0],      // Left
+    ["S", 0, 0],               // Center/Down
+    ["D", totalSize, 0]        // Right
+  ];
+
+  push();
+  translate(0, 20);
+  
+  for (let k of keys) {
+    let label = k[0];
+    let x = k[1] as number;
+    let y = k[2] as number;
+
+    // Draw Key Cap
+    fill(235, 226, 214);
+    stroke(77, 61, 47);
+    strokeWeight(2);
+    rectMode(CENTER);
+    rect(x, y, keySize, keySize, 8);
+
+    // Draw Letter
+    noStroke();
+    fill(77, 61, 47);
+    textAlign(CENTER, CENTER);
+    textSize(20);
+    text(label, x, y + 2);
+  }
+  pop();
+
+  textSize(16);
+  text("Use keys to move the baker", 0, 80);
+  pop();
+}
+
+function drawCookingTutorial() {
+  push();
+  textSize(24);
+  textAlign(CENTER);
+  text("THE KITCHEN FLOW", 0, -100);
+
+  // flowchart steps
+  const steps = [
+    { label: "1. GET", sprite: stationSprites['flour'], x: -140 },
+    { label: "2. PREP/ADD", sprite: stationSprites['prep'], x: 0 },
+    { label: "3. BAKE", sprite: stationSprites['oven'], x: 140 }
+  ];
+
+  steps.forEach(step => {
+    // Draw Sprite
+    if (step.sprite) {
+      imageMode(CENTER);
+      image(step.sprite, step.x, -20, 60, 60);
+    }
+    
+    // Draw Label
+    fill(77, 61, 47);
+    textSize(16);
+    textAlign(CENTER);
+    text(step.label, step.x, 35);
+  });
+
+  // Draw arrows between steps
+  textSize(20);
+  text("➔", -70, -20);
+  text("➔", 70, -20);
+
+  // Summary Text
+  textSize(14);
+  text("Follow the Recipe Book (R) to see\nwhat ingredients each dish needs!", 0, 100);
+  pop();
+}
+
+function drawRecipeTutorial() {
+  push();
+  textSize(24);
+  textAlign(CENTER);
+  text("RECIPES & MISTAKES", 0, -140);
+
+  push();
+  translate(0, -70);
+  drawKey("R", -45, 0);
+  
+  textSize(16);
+  fill(77, 61, 47);
+  textAlign(CENTER, CENTER);
+  text("OR", 0, 0);
+  
+  drawKey("ESC", 50, 0, 60); 
+  pop();
+
+  // Recipe Book Text
+  textAlign(CENTER);
+  fill(77, 61, 47);
+  textSize(16);
+  text("THE RECIPE BOOK", 0, -15);
+  textSize(12);
+  fill(120, 110, 90);
+  text("Open the book to check ingredients, steps, and prices.", 0, 5);
+
+  // --- MIDDLE: Ruined Food ---
+  const ruinedY = 85;
+  rectMode(CENTER);
+  fill(255, 100, 100, 30); 
+  noStroke();
+  rect(0, ruinedY, 420, 85, 10);
+
+  const ruinedSprite = recipeManager.getSprite('ruined-food');
+  if (ruinedSprite) {
+    imageMode(CENTER);
+    image(ruinedSprite, -160, ruinedY, 50, 50);
+  }
+
+  fill(77, 61, 47);
+  textAlign(LEFT, CENTER);
+  textSize(14);
+  text("RUINED FOOD", -120, ruinedY - 20);
+  textSize(11);
+  text("Mixing the wrong ingredients creates waste.\nThese items cannot be baked or served!", -120, ruinedY + 10);
+
+  // --- BOTTOM: The Trash ---
+  push();
+  translate(0, 175);
+  if (stationSprites['trash']) {
+    imageMode(CENTER);
+    image(stationSprites['trash'], -160, 0, 50, 50);
+  }
+  
+  textAlign(LEFT, CENTER);
+  fill(77, 61, 47);
+  textSize(14);
+  text("TRASH STATION", -120, -10);
+  textSize(11);
+  fill(120, 110, 90);
+  text("Throw away ruined food or unwanted items\nto clear your hands.", -120, 15);
+  pop();
+
+  pop();
+}
+
+function drawInteractionTutorial() {
+  push();
+  textSize(24);
+  textAlign(CENTER);
+  text("ACTIONS", 0, -100);
+
+  const keySize = 50;
+  const longKeyWidth = 140;
+
+  //INTERACT KEY (E / Click)
+  push();
+  translate(-110, -10); 
+  drawKey("E", 0, 0, keySize);
+  textSize(14);
+  fill(77, 61, 47);
+  text("INTERACT", 0, 45);
+  textSize(11);
+  fill(120, 110, 90);
+  text("(Pick up, Drop,\nTake Orders)", 0, 65);
+  pop();
+
+  //PROCESS KEY (F / Space)
+  push();
+  translate(110, -10);
+  drawKey("F", 0, 0, keySize);
+  drawKey("SPACE", 0, 70, longKeyWidth); 
+  textSize(14);
+  fill(77, 61, 47);
+  text("PROCESS", 0, 115);
+  textSize(11);
+  fill(120, 110, 90);
+  text("(Chop, Mix, Bake)", 0, 135);
+  pop();
+  
+  // Mouse reminder at the bottom
+  textSize(12);
+  fill(77, 61, 47);
+  text("You can also use MOUSE CLICK to interact!", 0, 180);
+  pop();
+}
+
+function drawServingTutorial(): void {
+  textSize(24);
+  text("SERVING GUESTS", 0, -180);
+
+  // --- TOP HALF: Taking Orders ---
+  push();
+  translate(-100, -100);
+  drawKey("E", 0, 0);
+  textAlign(LEFT, CENTER);
+  textSize(16);
+  fill(77, 61, 47);
+  text("TAKE ORDER", 60, -10);
+  textSize(12);
+  fill(120, 110, 90);
+  text("Stand in front of a guest\nand press E to take orders.", 60, 20);
+  pop();
+
+  // --- MIDDLE: Patience Meter ---
+  push();
+  translate(0, -10); 
+
+  if (moodSprite.neutral) {
+    imageMode(CENTER);
+    image(moodSprite.neutral, -60, 0, 40, 40); 
+  }
+
+  const tutBarW = 120;
+  const tutBarH = 15;
+  const barX = 40;
+
+  rectMode(CENTER);
+  noStroke();
+  fill(255, 255, 255, 200);
+  rect(barX, 0, tutBarW, tutBarH, 5);
+  
+  fill(241, 196, 15); 
+  rect(barX - 20, 0, tutBarW - 40, tutBarH, 5);
+
+  textAlign(CENTER);
+  fill(77, 61, 47);
+  textSize(14);
+  text("Watch their PATIENCE! If it runs out,\nthey leave without paying.", 0, 45);
+  pop();
+
+  // --- BOTTOM: The Pickup Counter ---
+  push();
+  translate(0, 150);
+  
+  if (stationSprites['pickup-left']) {
+    imageMode(CENTER);
+    image(stationSprites['pickup-left'], 0, -30, 80, 80);
+  }
+
+  translate(0, 40); 
+  fill(235, 226, 214);
+  stroke(77, 61, 47);
+  rectMode(CENTER);
+    
+  noStroke();
+  fill(77, 61, 47);
+  textSize(14);
+  textAlign(CENTER, CENTER);
+  text("Place finished food on PICKUP COUNTER", 0, 0);
+  pop();
+}
+
+
+function drawKey(label: string, x: number, y: number, w: number = 50): void {
+  push();
+  rectMode(CENTER);
+  fill(235, 226, 214);
+  stroke(77, 61, 47);
+  strokeWeight(2);
+  rect(x, y, w, 50, 8); 
+  
+  // shadow/depth effect
+  fill(180, 170, 150);
+  noStroke();
+  rect(x, y + 22, w - 10, 4, 2);
+
+  noStroke();
+  fill(77, 61, 47);
+  textAlign(CENTER, CENTER);
+  // smaller font for long words like "SPACE" or "CLICK"
+  textSize(label.length > 1 ? 12 : 20); 
+  text(label, x, y + 2);
+  pop();
+}
+
 
 function drawGameWorld(): void {
   background(235, 226, 214);
@@ -396,7 +782,6 @@ function drawPausedOverlay(): void {
     noStroke();
     rect(trackX, trackY, 10, trackHeight, 5);
 
-    // Calculate Handle
     // handleHeight represents the visible portion of the list
     let handleHeight = constrain(map(viewHeight, totalListHeight, totalListHeight + viewHeight, trackHeight - 200, 30), 30, trackHeight);
     // scrollPos maps how far we've scrolled to the track length
@@ -407,7 +792,7 @@ function drawPausedOverlay(): void {
     rect(trackX, -125 + scrollPos + handleHeight/2, 12, handleHeight, 5);
   }
 
-  // 3. DRAW RECIPES
+  // DRAW RECIPES
   push();
   for (let i = 0; i < recipes.length; i++) {
     let r = recipes[i];
@@ -476,8 +861,6 @@ function drawResults(): void {
 
   translate(width/2, height/2);
   fill(255, 240);
-  // stroke(77, 61, 47);
-  // strokeWeight(4);
   noStroke();
   rectMode(CENTER);
   rect(0, 0, 500, 580, 2);
@@ -500,14 +883,16 @@ function drawResults(): void {
   translate(220, -180);
   text(`$${hud.getScore()}`, 0, 0);
   text(`${recipeManager.totalOrdersCompleted}/${recipeManager.totalCustomersEntered}`, 0, 40);
-  // text(bestSeller, 0, 80);
   text(recipeManager.getTopSellingTitle(), 0, 80);
   pop();
   pop();
+  
   nextDayBtn.display();
   nextDayBtn.checkHover();
   returnBtn.display();
   returnBtn.checkHover();
+  downloadBtn.display();
+  downloadBtn.checkHover();
 }
 
 function startNextDay(): void {
@@ -516,10 +901,10 @@ function startNextDay(): void {
   spawnTimer = 0;
 
   if (player && player.keyH) {
-    player.keyH.clearKeys(); // We will create this method below
+    player.keyH.clearKeys();
   }
 
-  // 3. Clear the stations (Remove any leftover dough/food on counters)
+  //Clear the stations (Remove any leftover dough/food on counters)
   const allStations = [...stations, ...frontStations];
   for (let s of allStations) {
     if (s instanceof PickupCounter) s.contents = [];
@@ -529,10 +914,14 @@ function startNextDay(): void {
           s.contents = [];
       }
   }
-  player.currentAnimation = player.down;
-  player.isMoving = false;
-  player.x = 5;
-  player.y = 2;
+  if (player) {
+    player.currentAnimation = player.down;
+    player.isMoving = false;
+    player.x = 5;
+    player.y = 2;
+    player.heldItem = null;
+  }
+  
   gameState = "PLAYING";
 }
 
@@ -636,11 +1025,11 @@ function loadGame(): void {
 
   if (savedString) {
     const data = JSON.parse(savedString);
-    hud.setDayCount(data.day);
+    hud.setDayCount(data.day - 1);
     hud.setTime(data.timer);
     hud.setScore(data.score);
     recipeManager.loadSaveData(data.recipeStats);
-    gameState = "PLAYING";
+    gameState = "RESULTS";
   } else {
     console.log("No File Found.")
   }

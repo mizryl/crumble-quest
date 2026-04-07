@@ -11,7 +11,6 @@ export class CheckoutCounter extends BaseStation {
 
     }
 
-
     override interact(player: Player): void {
         const targetCustomer = customer.find(c =>
             c.state === 'WAITING' && c.isAtDestination()

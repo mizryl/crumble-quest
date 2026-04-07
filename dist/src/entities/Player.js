@@ -4,7 +4,7 @@ import { ProcessingStation } from "../stations/ProcessingStation.js";
 import { Oven } from "../stations/Oven.js";
 export class Player extends Entity {
     constructor(x, y, sprites, keyH, recipeManager) {
-        super(x, y, false, 0.06, sprites);
+        super(x, y, false, 0.06, sprites, "Player");
         this.tileSize = TileManager.TILE_SIZE;
         this.currentFrame = 0;
         this.debugMode = false;
@@ -100,6 +100,7 @@ export class Player extends Entity {
             pop();
         }
         this.checkStationProximity(stations);
+        this.recordMovement();
     }
     checkStationProximity(stations) {
         const size = TileManager.TILE_SIZE;
@@ -156,8 +157,6 @@ export class Player extends Entity {
                     // If it's a manual station and the key ISN'T pressed, stop it
                     targetStation.stopProcessing();
                 }
-                // Note: We don't call anything for Oven here because the 
-                // Oven's own update() method handles its progress!
             }
         }
         if (this.debugMode) {

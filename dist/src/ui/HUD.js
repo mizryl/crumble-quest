@@ -88,7 +88,7 @@ export class HUD {
         }
     }
     resetTimer() {
-        this.setTime(this.timer);
+        this.setTime(150);
     }
     addDayCount() {
         this.dayCount++;
