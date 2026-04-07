@@ -34,6 +34,7 @@ export class RecipeManager {
             steps: [
                 { action: 'PREP', item: 'flour+egg', output: 'batter'},
                 { action: 'BAKE', item: 'batter', output: 'sponge-cake'},
+                { action: 'PREP', item: 'fruit', output: 'chopped-fruit'},
                 { action: 'ADD', item: 'sponge-cake+chopped-fruit', output: 'fruit-cake'}
             ],
             bakeTime: 5,
