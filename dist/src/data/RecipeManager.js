@@ -132,8 +132,6 @@ export class RecipeManager {
         const allRecipes = this.getAllRecipes();
         return allRecipes.some(recipe => {
             return recipe.steps.some(step => {
-                // return step.action === stationId.toUpperCase() &&
-                //         step.item === ingredients.join('+');
                 const stepSorted = step.item.split('+').sort().join('+');
                 return step.action === stationId.toUpperCase() && stepSorted === sortedInput;
             });

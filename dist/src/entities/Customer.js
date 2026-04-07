@@ -8,8 +8,8 @@ export class Customer extends Entity {
         this.orderTaken = false;
         this.hasSetWaitingSpot = false;
         this.slot = null;
-        this.patience = 45;
-        this.maxPatience = 45;
+        this.patience = 60;
+        this.maxPatience = 60;
         this.targetX = targetX;
         this.targetY = targetY;
         this.recipeName = recipe;
@@ -23,9 +23,6 @@ export class Customer extends Entity {
         if (this.orderTaken && (this.state === 'ORDERED' || this.state === 'WAITING' || this.state === "WAITING_FOR_FOOD")) {
             this.order();
         }
-        if (this.state === "WAITING" || this.state === "WAITING_FOR_FOOD") {
-        }
-        // this.displayPatienceIcon();
         this.drawPatienceBar();
         this.displayPatienceIcon();
     }

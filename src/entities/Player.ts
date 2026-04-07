@@ -1,6 +1,5 @@
 import { Image } from "p5";
 import { Entity } from './Entity.js';
-// import { SpriteData } from "../interface.js";
 import { KeyHandler } from "./KeyHandler.js";
 import { TileManager } from "../world/TileManager.js";
 import { BaseStation } from "../stations/BaseStation.js";
@@ -12,11 +11,10 @@ export class Player extends Entity {
     private readonly tileSize = TileManager.TILE_SIZE;
     public keyH: KeyHandler;
     currentFrame: number = 0;
-    debugMode = false;
+    debugMode = true;
     public moving: boolean = false;
     public currentTargetStation: BaseStation | null = null;
 
-    // inventoryFull: boolean = false;
     heldItem: string | null = null;
     recipeManager: RecipeManager;
     
@@ -84,7 +82,6 @@ export class Player extends Entity {
         let collision = false;
         const playerHB = this.getHitbox(nextX, nextY);
         for (const s of stations) {
-            // if (s.id === 'display' || s.id === 'checkout' || s.id === 'pickup') continue;
             if (!s.isSolid) continue;
 
             const stationHB = s.getHitbox();
@@ -155,10 +152,10 @@ export class Player extends Entity {
         sensor = { x: interactX + 10, y: (this.y * size) + 128, w: 44, h: reachY };
     } 
     else if (this.currentAnimation === this.left) {
-        sensor = { x: interactX - reachX + 20, y: interactY + 10, w: reachX, h: 44 };
+        sensor = { x: interactX - reachX + 25, y: interactY + 10, w: reachX, h: 44 };
     } 
     else if (this.currentAnimation === this.right) {
-        sensor = { x: interactX + size - 20, y: interactY + 10, w: reachX, h: 44 };
+        sensor = { x: interactX + size - 25, y: interactY + 10, w: reachX, h: 44 };
     }
 
     //Collision Check (AABB)

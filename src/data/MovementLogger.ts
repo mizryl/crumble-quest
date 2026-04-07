@@ -16,14 +16,14 @@ export class MovementLogger {
     report.push("==========================================");
     report.push("");
 
-    // 1. Comparison/Ranking Logic
+    // Comparison/Ranking Logic
     // Sorts the array: Highest totalDistanceMoved at the top
     const ranked = [...entities].sort((a, b) => b.totalDistanceMoved - a.totalDistanceMoved);
 
     report.push("RANKING BY ACTIVITY:");
     report.push("------------------------------------------");
 
-    // 2. Format Data & Coordinates
+    // Format Data & Coordinates
     ranked.forEach((e, index) => {
       // Determine if it's the player or a customer for the log
       const type = e instanceof Player ? "BAKER" : "GUEST";
@@ -37,8 +37,7 @@ export class MovementLogger {
     report.push("------------------------------------------");
     report.push("End of Day Report Generated Successfully.");
 
-    // 3. Generate External File (Triggers Browser Download)
-    // saveStrings is a p5.js global function
+    // Generate External File (Triggers Browser Download)
     (window as any).saveStrings(report, 'CrumbleQuest_Movement_Report.txt');
   }
 }

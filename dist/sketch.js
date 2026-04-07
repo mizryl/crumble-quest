@@ -34,7 +34,7 @@ let stationSprites = {};
 //customer
 export let customer = [];
 let spawnTimer = 0;
-const SPAWN_INTERVAL = 8000;
+const SPAWN_INTERVAL = 10000;
 const customerSprites = {
     'c2': { up: [], down: [], left: [], right: [] },
     'c3': { up: [], down: [], left: [], right: [] }

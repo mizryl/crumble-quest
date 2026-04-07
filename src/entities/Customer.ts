@@ -15,8 +15,8 @@ export class Customer extends Entity {
     private hasSetWaitingSpot: boolean = false;
     private slot: any = null;
     private targetCounter : any;
-    private patience: number = 45;
-    private maxPatience: number = 45;
+    private patience: number = 60;
+    private maxPatience: number = 60;
     private moodSprites: any;
 
     private static waitingSlots = [
@@ -53,14 +53,8 @@ export class Customer extends Entity {
             this.order();
         }
 
-        if (this.state === "WAITING" || this.state === "WAITING_FOR_FOOD") {
-            
-        }
-        // this.displayPatienceIcon();
         this.drawPatienceBar();
         this.displayPatienceIcon();
-
-        
     }
 
     override update(tileM: TileManager, stations: BaseStation[]) {

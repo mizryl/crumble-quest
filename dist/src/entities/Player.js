@@ -7,10 +7,9 @@ export class Player extends Entity {
         super(x, y, false, 0.06, sprites, "Player");
         this.tileSize = TileManager.TILE_SIZE;
         this.currentFrame = 0;
-        this.debugMode = false;
+        this.debugMode = true;
         this.moving = false;
         this.currentTargetStation = null;
-        // inventoryFull: boolean = false;
         this.heldItem = null;
         this.keyH = keyH;
         this.currentAnimation = this.down;
@@ -63,7 +62,6 @@ export class Player extends Entity {
         let collision = false;
         const playerHB = this.getHitbox(nextX, nextY);
         for (const s of stations) {
-            // if (s.id === 'display' || s.id === 'checkout' || s.id === 'pickup') continue;
             if (!s.isSolid)
                 continue;
             const stationHB = s.getHitbox();
@@ -120,10 +118,10 @@ export class Player extends Entity {
             sensor = { x: interactX + 10, y: (this.y * size) + 128, w: 44, h: reachY };
         }
         else if (this.currentAnimation === this.left) {
-            sensor = { x: interactX - reachX + 20, y: interactY + 10, w: reachX, h: 44 };
+            sensor = { x: interactX - reachX + 25, y: interactY + 10, w: reachX, h: 44 };
         }
         else if (this.currentAnimation === this.right) {
-            sensor = { x: interactX + size - 20, y: interactY + 10, w: reachX, h: 44 };
+            sensor = { x: interactX + size - 25, y: interactY + 10, w: reachX, h: 44 };
         }
         //Collision Check (AABB)
         let targetStation = null;

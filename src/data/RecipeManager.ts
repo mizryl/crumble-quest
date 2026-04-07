@@ -155,8 +155,7 @@ export class RecipeManager {
        
         return allRecipes.some(recipe => {
             return recipe.steps.some(step => {
-                // return step.action === stationId.toUpperCase() &&
-                //         step.item === ingredients.join('+');
+
                 const stepSorted = step.item.split('+').sort().join('+');
                 return step.action === stationId.toUpperCase() && stepSorted === sortedInput;
             })
@@ -221,15 +220,15 @@ export class RecipeManager {
     }
 
     // Add a parameter for the sort type
-public getFilteredRecipes(query: string, sortType: 'value' | 'title' | 'none'): Recipe[] {
-    let list = this.searchRecipes(query);
-    
-    if (sortType !== 'none') {
-        list = this.manualSortList(list, sortType);
+    public getFilteredRecipes(query: string, sortType: 'value' | 'title' | 'none'): Recipe[] {
+        let list = this.searchRecipes(query);
+        
+        if (sortType !== 'none') {
+            list = this.manualSortList(list, sortType);
+        }
+        
+        return list;
     }
-    
-    return list;
-}
 
     public manualSortList(list: Recipe[], criteria: 'value' | 'title'): Recipe[] {
         let n = list.length;
