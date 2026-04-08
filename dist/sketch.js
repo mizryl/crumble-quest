@@ -442,7 +442,7 @@ function drawInteractionTutorial() {
     //INTERACT KEY (J / Click)
     push();
     translate(-110, -10);
-    drawKey("J", 0, 0, keySize);
+    drawKey("E", 0, 0, keySize);
     textSize(14);
     fill(77, 61, 47);
     text("INTERACT", 0, 45);
@@ -453,7 +453,7 @@ function drawInteractionTutorial() {
     //PROCESS KEY (K / Space)
     push();
     translate(110, -10);
-    drawKey("K", 0, 0, keySize);
+    drawKey("F", 0, 0, keySize);
     drawKey("SPACE", 0, 70, longKeyWidth);
     textSize(14);
     fill(77, 61, 47);
@@ -474,14 +474,14 @@ function drawServingTutorial() {
     // --- TOP HALF: Taking Orders ---
     push();
     translate(-100, -100);
-    drawKey("J", 0, 0);
+    drawKey("E", 0, 0);
     textAlign(LEFT, CENTER);
     textSize(16);
     fill(77, 61, 47);
     text("TAKE ORDER", 60, -10);
     textSize(12);
     fill(120, 110, 90);
-    text("Stand in front of a guest\nand press J to take orders.", 60, 20);
+    text("Stand in front of a guest\nand press E to take orders.", 60, 20);
     pop();
     // --- MIDDLE: Patience Meter ---
     push();

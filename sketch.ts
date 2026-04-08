@@ -532,7 +532,7 @@ function drawInteractionTutorial() {
   const keySize = 50;
   const longKeyWidth = 140;
 
-  //INTERACT KEY (E / Click)
+  //INTERACT KEY (J / Click)
   push();
   translate(-110, -10); 
   drawKey("E", 0, 0, keySize);
@@ -544,7 +544,7 @@ function drawInteractionTutorial() {
   text("(Pick up, Drop,\nTake Orders)", 0, 65);
   pop();
 
-  //PROCESS KEY (F / Space)
+  //PROCESS KEY (K / Space)
   push();
   translate(110, -10);
   drawKey("F", 0, 0, keySize);
