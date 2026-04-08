@@ -7,7 +7,7 @@ export class Player extends Entity {
         super(x, y, false, 0.06, sprites, "Player");
         this.tileSize = TileManager.TILE_SIZE;
         this.currentFrame = 0;
-        this.debugMode = true;
+        this.debugMode = false;
         this.moving = false;
         this.currentTargetStation = null;
         this.heldItem = null;
