@@ -34,7 +34,7 @@ let stationSprites = {};
 //customer
 export let customer = [];
 let spawnTimer = 0;
-const SPAWN_INTERVAL = 10000;
+const SPAWN_INTERVAL = 8000;
 const customerSprites = {
     'c2': { up: [], down: [], left: [], right: [] },
     'c3': { up: [], down: [], left: [], right: [] }
@@ -64,6 +64,7 @@ let tutorialPage = 0;
 const MAX_TUTORIAL_PAGES = 4;
 let isDownloading = false;
 let bgm;
+let previousState = "START";
 function preload() {
     //tiles
     font = loadFont('assets/fonts/PixelCode-Bold.ttf');
@@ -107,7 +108,7 @@ function preload() {
 function setup() {
     noSmooth();
     pixelDensity(2);
-    // console.log("Setup is running!");
+    // console.log("Setup is running!")
     tileM.parseLoadedMap(mapData);
     createCanvas(tileM.worldWidth, tileM.worldHeight);
     //btns
@@ -180,7 +181,17 @@ function draw() {
             hud.updateTime(deltaTime / 1000);
             break;
         case "PAUSED":
-            drawGameWorld();
+            if (previousState === "START" || previousState === "TUTORIAL") {
+                drawMainMenu();
+            }
+            else if (previousState === "RESULTS") {
+                drawGameWorld();
+                drawResults();
+            }
+            else {
+                drawGameWorld();
+            }
+            drawPausedOverlay();
             if (keyIsDown(BACKSPACE)) { // BACKSPACE is a p5 constant (8)
                 if (millis() - lastBackspaceTime > BACKSPACE_DELAY) {
                     searchQuery = searchQuery.slice(0, -1);
@@ -239,7 +250,7 @@ function mousePressed() {
                 // Create a clean, shallow copy of the entities
                 const currentCustomers = [...customer];
                 const allMovers = [player, ...currentCustomers];
-                console.log(`Exporting report for ${allMovers.length} entities...`);
+                // console.log(`Exporting report for ${allMovers.length} entities...`);
                 try {
                     MovementLogger.exportReport(allMovers);
                 }
@@ -428,10 +439,10 @@ function drawInteractionTutorial() {
     text("ACTIONS", 0, -100);
     const keySize = 50;
     const longKeyWidth = 140;
-    //INTERACT KEY (E / Click)
+    //INTERACT KEY (J / Click)
     push();
     translate(-110, -10);
-    drawKey("E", 0, 0, keySize);
+    drawKey("J", 0, 0, keySize);
     textSize(14);
     fill(77, 61, 47);
     text("INTERACT", 0, 45);
@@ -439,10 +450,10 @@ function drawInteractionTutorial() {
     fill(120, 110, 90);
     text("(Pick up, Drop,\nTake Orders)", 0, 65);
     pop();
-    //PROCESS KEY (F / Space)
+    //PROCESS KEY (K / Space)
     push();
     translate(110, -10);
-    drawKey("F", 0, 0, keySize);
+    drawKey("K", 0, 0, keySize);
     drawKey("SPACE", 0, 70, longKeyWidth);
     textSize(14);
     fill(77, 61, 47);
@@ -463,14 +474,14 @@ function drawServingTutorial() {
     // --- TOP HALF: Taking Orders ---
     push();
     translate(-100, -100);
-    drawKey("E", 0, 0);
+    drawKey("J", 0, 0);
     textAlign(LEFT, CENTER);
     textSize(16);
     fill(77, 61, 47);
     text("TAKE ORDER", 60, -10);
     textSize(12);
     fill(120, 110, 90);
-    text("Stand in front of a guest\nand press E to take orders.", 60, 20);
+    text("Stand in front of a guest\nand press J to take orders.", 60, 20);
     pop();
     // --- MIDDLE: Patience Meter ---
     push();
@@ -613,6 +624,7 @@ export function refreshQueue() {
     });
 }
 function drawPausedOverlay() {
+    player.keyH.clearKeys();
     push();
     //Book Background
     translate(width / 2, height / 2);
@@ -775,10 +787,6 @@ function mouseWheel(event) {
         scrollY = constrain(scrollY, 0, maxScroll);
     }
 }
-function newGame() {
-    dayCount = 0;
-    startNextDay();
-}
 function drawCloudBorder() {
     fill(255, 255, 255, 200);
     noStroke();
@@ -803,12 +811,12 @@ function startGame() {
 }
 function keyPressed() {
     if (keyCode === ESCAPE) {
-        if (gameState === 'PLAYING') {
-            gameState = 'PAUSED';
+        if (gameState === 'PAUSED') {
+            gameState = previousState;
         }
-        else if (gameState === 'PAUSED') {
-            gameState = 'PLAYING';
-            console.log('Game Resumed');
+        else {
+            previousState = gameState;
+            gameState = 'PAUSED';
         }
         return false;
     }

@@ -86,6 +86,8 @@ const MAX_TUTORIAL_PAGES = 4;
 let isDownloading = false;
 let bgm: any;
 
+let previousState: string = "START";
+
 
 function preload(): void {
   //tiles
@@ -222,7 +224,16 @@ function draw(): void {
       break;
 
     case "PAUSED":
-      drawGameWorld();
+      if (previousState === "START" || previousState === "TUTORIAL") {
+        drawMainMenu(); 
+      } else if (previousState === "RESULTS") {
+          drawGameWorld();
+          drawResults();
+      } else {
+          drawGameWorld();
+      }
+      drawPausedOverlay();
+      
       if (keyIsDown(BACKSPACE)) { // BACKSPACE is a p5 constant (8)
         if (millis() - lastBackspaceTime > BACKSPACE_DELAY) {
           searchQuery = searchQuery.slice(0, -1);
@@ -744,6 +755,9 @@ export function refreshQueue() {
 }
 
 function drawPausedOverlay(): void {
+
+  player.keyH.clearKeys();
+  
   push();
   //Book Background
   translate(width/2, height/2);
@@ -941,11 +955,6 @@ function mouseWheel(event: any) {
   }
 }
 
-function newGame() {
-  dayCount = 0;
-  startNextDay();
-}
-
 function drawCloudBorder() {
   fill(255, 255, 255, 200);
   noStroke();
@@ -980,13 +989,13 @@ function startGame(): void {
 function keyPressed() {
 
   if (keyCode === ESCAPE) {
-    if (gameState === 'PLAYING') {
+    if (gameState === 'PAUSED') {
+      gameState = previousState as any;
+    } else {
+      previousState = gameState;
       gameState = 'PAUSED';
-  
-    } else if (gameState === 'PAUSED') {
-      gameState = 'PLAYING';
-      // console.log('Game Resumed');
     }
+    
     return false;
   }
 
@@ -1035,7 +1044,7 @@ function saveGame(): void {
 
   //store as a string in the browser
   localStorage.setItem('CrumbleQuestSave', JSON.stringify(gameStateData));
-  // console.log("Game Saved.");
+  console.log("Game Saved.");
 }
 
 function loadGame(): void {
@@ -1049,7 +1058,7 @@ function loadGame(): void {
     recipeManager.loadSaveData(data.recipeStats);
     gameState = "RESULTS";
   } else {
-    // console.log("No File Found.")
+    console.log("No File Found.")
   }
 }
 

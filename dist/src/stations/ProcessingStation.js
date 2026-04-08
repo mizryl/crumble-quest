@@ -43,7 +43,7 @@ export class ProcessingStation extends BaseStation {
             return;
         if (this.isProcessing) {
             this.isProcessing = false;
-            console.log("processing has stopped");
+            // console.log("processing has stopped")
         }
     }
     updateProgress(dt) {
@@ -58,7 +58,7 @@ export class ProcessingStation extends BaseStation {
         this.isFinished = true;
         this.isProcessing = false;
         this.currentProgress = this.processingTime;
-        console.log("Processing Complete");
+        // console.log("Processing Complete");    
     }
     interact(player) {
         //DEPOSIT
@@ -68,14 +68,14 @@ export class ProcessingStation extends BaseStation {
             player.heldItem = null;
             this.isFinished = false; //resets when new items are added
             this.currentProgress = 0;
-            console.log(this.contents);
+            // console.log(this.contents);
             return;
         }
         //PICK UP
         if (!player.heldItem && this.contents.length > 0) {
             if (this.isFinished) {
                 player.heldItem = this.getTransformedItem();
-                console.log(`You picked-up: ${player.heldItem}`);
+                // console.log(`You picked-up: ${player.heldItem}`)
                 this.contents = []; //clears table
                 this.isFinished = false;
                 this.isProcessing = false;

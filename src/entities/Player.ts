@@ -11,7 +11,7 @@ export class Player extends Entity {
     private readonly tileSize = TileManager.TILE_SIZE;
     public keyH: KeyHandler;
     currentFrame: number = 0;
-    debugMode = false;
+    debugMode = true;
     public moving: boolean = false;
     public currentTargetStation: BaseStation | null = null;
 
@@ -146,7 +146,7 @@ export class Player extends Entity {
     let sensor = { x: 0, y: 0, w: 0, h: 0 };
 
     if (this.currentAnimation === this.up) {
-        sensor = { x: interactX + 10, y: interactY - reachY, w: 44, h: reachY };
+        sensor = { x: interactX + 30, y: interactY - reachY, w: 10, h: reachY };
     } 
     else if (this.currentAnimation === this.down) {
         sensor = { x: interactX + 10, y: (this.y * size) + 128, w: 44, h: reachY };

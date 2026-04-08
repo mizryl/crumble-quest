@@ -21,9 +21,9 @@ export class KeyHandler {
             this.leftPressed = true;
         if (keyLower === 'd')
             this.rightPressed = true;
-        if (keyLower === 'e')
+        if (keyLower === 'j')
             this.interactPressed = true;
-        if (keyLower === 'f' || k === ' ')
+        if (keyLower === 'k' || k === ' ')
             this.processPressed = true;
     }
     handleReleased(k) {
@@ -36,9 +36,9 @@ export class KeyHandler {
             this.leftPressed = false;
         if (keyLower === 'd')
             this.rightPressed = false;
-        if (keyLower === 'e')
+        if (keyLower === 'j')
             this.interactPressed = false;
-        if (keyLower === 'f' || k === ' ')
+        if (keyLower === 'k' || k === ' ')
             this.processPressed = false;
     }
     handleSearchBackspace(currentQuery) {
@@ -58,7 +58,6 @@ export class KeyHandler {
         this.interactPressed = false;
         this.processPressed = false;
         this.pausePressed = false;
-        console.log("Input buffer cleared for the new day.");
     }
 }
 //# sourceMappingURL=KeyHandler.js.map
