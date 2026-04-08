@@ -47,7 +47,7 @@ let stationSprites: { [key: string]: Image } = {};
 //customer
 export let customer: Customer[]= [];
 let spawnTimer = 0;
-const SPAWN_INTERVAL = 10000;
+const SPAWN_INTERVAL = 8000;
 
 const customerSprites: Record<string, any> = {
   'c2': { up: [], down: [], left: [], right: []},
