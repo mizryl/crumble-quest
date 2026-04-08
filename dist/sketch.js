@@ -63,6 +63,7 @@ const maxQueryLength = 30;
 let tutorialPage = 0;
 const MAX_TUTORIAL_PAGES = 4;
 let isDownloading = false;
+let bgm;
 function preload() {
     //tiles
     font = loadFont('assets/fonts/PixelCode-Bold.ttf');
@@ -101,6 +102,7 @@ function preload() {
     moodSprite.happy = loadImage('assets/img/mood/happy.png');
     moodSprite.neutral = loadImage('assets/img/mood/neutral.png');
     moodSprite.angry = loadImage('assets/img/mood/mad.png');
+    bgm = loadSound('assets/audio/music.mp3');
 }
 function setup() {
     noSmooth();
@@ -194,6 +196,10 @@ function draw() {
 function mousePressed() {
     switch (gameState) {
         case "START":
+            if (bgm && !bgm.isPlaying()) {
+                bgm.loop();
+                bgm.setVolume(0.1);
+            }
             if (startBtn && startBtn.isClicked())
                 startGame();
             if (loadBtn && loadBtn.isClicked())
@@ -217,6 +223,9 @@ function mousePressed() {
             break;
         case "RESULTS":
             saveGame(); //save automatically
+            if (bgm && bgm.isPlaying()) {
+                bgm.setVolume(0.05);
+            }
             if (nextDayBtn && nextDayBtn.isClicked()) {
                 startNextDay();
             }
@@ -255,9 +264,6 @@ function drawMainMenu() {
     startBtn.display();
     loadBtn.display();
     tutorialBtn.display();
-    // if (tutorialBtn && tutorialBtn.isClicked()) {
-    //   gameState = 'TUTORIAL';
-    // }
 }
 function drawTutorialOverlay() {
     gameState = "TUTORIAL";
@@ -369,7 +375,7 @@ function drawCookingTutorial() {
     text("➔", 70, -20);
     // Summary Text
     textSize(14);
-    text("Follow the Recipe Book (R) to see\nwhat ingredients each dish needs!", 0, 100);
+    text("Follow the Recipe Book (ESC) to see\nwhat ingredients each dish needs!", 0, 100);
     pop();
 }
 function drawRecipeTutorial() {
@@ -379,12 +385,7 @@ function drawRecipeTutorial() {
     text("RECIPES & MISTAKES", 0, -140);
     push();
     translate(0, -70);
-    drawKey("R", -45, 0);
-    textSize(16);
-    fill(77, 61, 47);
-    textAlign(CENTER, CENTER);
-    text("OR", 0, 0);
-    drawKey("ESC", 50, 0, 60);
+    drawKey("ESC", 0, 0, 80);
     pop();
     // Recipe Book Text
     textAlign(CENTER);
@@ -761,11 +762,10 @@ function startNextDay() {
     if (player) {
         player.currentAnimation = player.down;
         player.isMoving = false;
-        player.x = 5;
-        player.y = 2;
         player.heldItem = null;
     }
     gameState = "PLAYING";
+    spawnTimer = SPAWN_INTERVAL;
 }
 function mouseWheel(event) {
     if (gameState === "PAUSED") {
@@ -775,6 +775,10 @@ function mouseWheel(event) {
         let maxScroll = max(0, (recipesToShow.length * 145) - 360);
         scrollY = constrain(scrollY, 0, maxScroll);
     }
+}
+function newGame() {
+    dayCount = 0;
+    startNextDay();
 }
 function drawCloudBorder() {
     fill(255, 255, 255, 200);
@@ -789,11 +793,17 @@ function drawCloudBorder() {
     }
 }
 function startGame() {
+    hud.setScore(0);
+    hud.setDayCount(0);
+    hud.resetTimer();
+    startNextDay();
+    recipeManager.totalOrdersCompleted = 0;
+    recipeManager.totalCustomersEntered = 0;
     gameState = "PLAYING";
     spawnTimer = SPAWN_INTERVAL;
 }
 function keyPressed() {
-    if (keyCode === ESCAPE || (key.toLowerCase() === 'r')) {
+    if (keyCode === ESCAPE) {
         if (gameState === 'PLAYING') {
             gameState = 'PAUSED';
         }
@@ -845,7 +855,7 @@ function loadGame() {
     const savedString = localStorage.getItem('CrumbleQuestSave');
     if (savedString) {
         const data = JSON.parse(savedString);
-        hud.setDayCount(data.day - 1);
+        hud.setDayCount(data.day);
         hud.setTime(data.timer);
         hud.setScore(data.score);
         recipeManager.loadSaveData(data.recipeStats);

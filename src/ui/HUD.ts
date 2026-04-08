@@ -3,6 +3,7 @@ import { Color } from "p5";
 export class HUD {
     private score: number = 0;
     private timer: number = 150;
+    private maxTimer: number = 150;
     private dayCount: number = 0;
 
     //score-related
@@ -108,7 +109,7 @@ export class HUD {
     }
 
     public resetTimer() {
-        this.setTime(150);
+        this.setTime(this.maxTimer);
     }
 
     public addDayCount(){

@@ -1,4 +1,6 @@
 import { Image } from 'p5';
+import { SoundFile } from 'p5';
+
 import { RollingPinButton } from './src/ui/RollingPinButton.js';
 import { TileManager } from './src/world/TileManager.js';
 import { Player } from './src/entities/Player.js'
@@ -82,6 +84,7 @@ let tutorialPage = 0;
 const MAX_TUTORIAL_PAGES = 4; 
 
 let isDownloading = false;
+let bgm: any;
 
 
 function preload(): void {
@@ -128,6 +131,7 @@ function preload(): void {
   moodSprite.neutral = loadImage('assets/img/mood/neutral.png');
   moodSprite.angry = loadImage('assets/img/mood/mad.png');
   
+  bgm = loadSound('assets/audio/music.mp3');
 }
 
 function setup(): void {
@@ -237,6 +241,11 @@ function mousePressed(): void {
   switch (gameState) {
     case "START":
       
+    if (bgm && !bgm.isPlaying()) {
+        bgm.loop();
+        bgm.setVolume(0.1);
+      }
+      
       if (startBtn && startBtn.isClicked()) startGame();
       if (loadBtn && loadBtn.isClicked()) loadGame();
       if (tutorialBtn.isClicked()) { 
@@ -264,6 +273,10 @@ function mousePressed(): void {
 
     case "RESULTS":
       saveGame(); //save automatically
+      
+      if (bgm && bgm.isPlaying()) {
+        bgm.setVolume(0.05);
+      }
 
       if (nextDayBtn && nextDayBtn.isClicked()) {
         startNextDay();
@@ -311,9 +324,6 @@ function drawMainMenu(): void {
   startBtn.display();
   loadBtn.display();
   tutorialBtn.display();
-  // if (tutorialBtn && tutorialBtn.isClicked()) {
-  //   gameState = 'TUTORIAL';
-  // }
 }
 
 function drawTutorialOverlay(): void {
@@ -446,7 +456,7 @@ function drawCookingTutorial() {
 
   // Summary Text
   textSize(14);
-  text("Follow the Recipe Book (R) to see\nwhat ingredients each dish needs!", 0, 100);
+  text("Follow the Recipe Book (ESC) to see\nwhat ingredients each dish needs!", 0, 100);
   pop();
 }
 
@@ -458,14 +468,8 @@ function drawRecipeTutorial() {
 
   push();
   translate(0, -70);
-  drawKey("R", -45, 0);
   
-  textSize(16);
-  fill(77, 61, 47);
-  textAlign(CENTER, CENTER);
-  text("OR", 0, 0);
-  
-  drawKey("ESC", 50, 0, 60); 
+  drawKey("ESC", 0, 0, 80); 
   pop();
 
   // Recipe Book Text
@@ -917,12 +921,11 @@ function startNextDay(): void {
   if (player) {
     player.currentAnimation = player.down;
     player.isMoving = false;
-    player.x = 5;
-    player.y = 2;
     player.heldItem = null;
   }
   
   gameState = "PLAYING";
+  spawnTimer = SPAWN_INTERVAL;
 }
 
 function mouseWheel(event: any) {
@@ -936,6 +939,11 @@ function mouseWheel(event: any) {
     
     scrollY = constrain(scrollY, 0, maxScroll);
   }
+}
+
+function newGame() {
+  dayCount = 0;
+  startNextDay();
 }
 
 function drawCloudBorder() {
@@ -954,14 +962,24 @@ function drawCloudBorder() {
 }
 
 function startGame(): void {
+  hud.setScore(0);
+  hud.setDayCount(0);
+  hud.resetTimer();
+
+  startNextDay();
+
+  recipeManager.totalOrdersCompleted = 0;
+  recipeManager.totalCustomersEntered = 0;
+
   gameState = "PLAYING";
   spawnTimer = SPAWN_INTERVAL;
+
   
 }
 
 function keyPressed() {
 
-  if (keyCode === ESCAPE || (key.toLowerCase() === 'r')) {
+  if (keyCode === ESCAPE) {
     if (gameState === 'PLAYING') {
       gameState = 'PAUSED';
   
@@ -1025,7 +1043,7 @@ function loadGame(): void {
 
   if (savedString) {
     const data = JSON.parse(savedString);
-    hud.setDayCount(data.day - 1);
+    hud.setDayCount(data.day);
     hud.setTime(data.timer);
     hud.setScore(data.score);
     recipeManager.loadSaveData(data.recipeStats);

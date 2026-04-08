@@ -2,6 +2,7 @@ export class HUD {
     constructor() {
         this.score = 0;
         this.timer = 150;
+        this.maxTimer = 150;
         this.dayCount = 0;
     }
     //score-related
@@ -88,7 +89,7 @@ export class HUD {
         }
     }
     resetTimer() {
-        this.setTime(150);
+        this.setTime(this.maxTimer);
     }
     addDayCount() {
         this.dayCount++;

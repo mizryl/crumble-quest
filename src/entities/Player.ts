@@ -11,7 +11,7 @@ export class Player extends Entity {
     private readonly tileSize = TileManager.TILE_SIZE;
     public keyH: KeyHandler;
     currentFrame: number = 0;
-    debugMode = true;
+    debugMode = false;
     public moving: boolean = false;
     public currentTargetStation: BaseStation | null = null;
 
