@@ -137,7 +137,7 @@ function preload(): void {
 function setup(): void {
   noSmooth();
   pixelDensity(2);
-  console.log("Setup is running!")
+  // console.log("Setup is running!")
   tileM.parseLoadedMap(mapData);
   createCanvas(tileM.worldWidth, tileM.worldHeight);
   
@@ -156,7 +156,7 @@ function setup(): void {
 
   textFont(font);
   textAlign(CENTER, CENTER);
-  console.log("Game initialized in START state");
+  // console.log("Game initialized in START state");
 
   //Game-related
   recipeManager = new RecipeManager();
@@ -295,7 +295,7 @@ function mousePressed(): void {
         const currentCustomers = [...customer]; 
         const allMovers = [player, ...currentCustomers];
     
-        console.log(`Exporting report for ${allMovers.length} entities...`);
+        // console.log(`Exporting report for ${allMovers.length} entities...`);
         
         try {
           MovementLogger.exportReport(allMovers);
@@ -985,7 +985,7 @@ function keyPressed() {
   
     } else if (gameState === 'PAUSED') {
       gameState = 'PLAYING';
-      console.log('Game Resumed');
+      // console.log('Game Resumed');
     }
     return false;
   }
@@ -1035,7 +1035,7 @@ function saveGame(): void {
 
   //store as a string in the browser
   localStorage.setItem('CrumbleQuestSave', JSON.stringify(gameStateData));
-  console.log("Game Saved.");
+  // console.log("Game Saved.");
 }
 
 function loadGame(): void {
@@ -1049,7 +1049,7 @@ function loadGame(): void {
     recipeManager.loadSaveData(data.recipeStats);
     gameState = "RESULTS";
   } else {
-    console.log("No File Found.")
+    // console.log("No File Found.")
   }
 }
 

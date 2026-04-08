@@ -107,7 +107,7 @@ function preload() {
 function setup() {
     noSmooth();
     pixelDensity(2);
-    console.log("Setup is running!");
+    // console.log("Setup is running!");
     tileM.parseLoadedMap(mapData);
     createCanvas(tileM.worldWidth, tileM.worldHeight);
     //btns
@@ -120,7 +120,7 @@ function setup() {
     gameState = "START";
     textFont(font);
     textAlign(CENTER, CENTER);
-    console.log("Game initialized in START state");
+    // console.log("Game initialized in START state");
     //Game-related
     recipeManager = new RecipeManager();
     keyH = new KeyHandler();

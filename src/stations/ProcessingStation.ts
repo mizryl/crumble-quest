@@ -63,7 +63,7 @@ export abstract class ProcessingStation extends BaseStation {
 
         if (this.isProcessing) {
             this.isProcessing = false;
-            console.log("processing has stopped")
+            // console.log("processing has stopped")
         }
     }
     
@@ -81,7 +81,7 @@ export abstract class ProcessingStation extends BaseStation {
         this.isFinished = true;
         this.isProcessing = false;
         this.currentProgress = this.processingTime;
-        console.log("Processing Complete");    
+        // console.log("Processing Complete");    
     }
 
     override interact(player: Player): void {
@@ -93,7 +93,7 @@ export abstract class ProcessingStation extends BaseStation {
             player.heldItem = null;
             this.isFinished = false; //resets when new items are added
             this.currentProgress = 0;
-            console.log(this.contents);
+            // console.log(this.contents);
             return;
         }
 
@@ -101,7 +101,7 @@ export abstract class ProcessingStation extends BaseStation {
         if (!player.heldItem && this.contents.length > 0) {
             if (this.isFinished) {
                 player.heldItem = this.getTransformedItem();
-                console.log(`You picked-up: ${player.heldItem}`)
+                // console.log(`You picked-up: ${player.heldItem}`)
                 this.contents = []; //clears table
                 this.isFinished = false;
                 this.isProcessing = false;
