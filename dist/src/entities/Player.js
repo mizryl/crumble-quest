@@ -118,10 +118,10 @@ export class Player extends Entity {
             sensor = { x: interactX + 10, y: (this.y * size) + 128, w: 44, h: reachY };
         }
         else if (this.currentAnimation === this.left) {
-            sensor = { x: interactX - reachX + 25, y: interactY + 10, w: reachX, h: 44 };
+            sensor = { x: interactX - reachX + 10, y: interactY + 10, w: reachX, h: 44 };
         }
         else if (this.currentAnimation === this.right) {
-            sensor = { x: interactX + size - 25, y: interactY + 10, w: reachX, h: 44 };
+            sensor = { x: interactX + size - 10, y: interactY + 10, w: reachX, h: 44 };
         }
         //Collision Check (AABB)
         let targetStation = null;
