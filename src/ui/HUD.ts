@@ -1,5 +1,3 @@
-import { Color } from "p5";
-
 export class HUD {
     private score: number = 0;
     private timer: number = 150;
