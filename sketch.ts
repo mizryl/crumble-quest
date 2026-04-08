@@ -136,6 +136,7 @@ function preload(): void {
 
 function setup(): void {
   noSmooth();
+  pixelDensity(2);
   console.log("Setup is running!")
   tileM.parseLoadedMap(mapData);
   createCanvas(tileM.worldWidth, tileM.worldHeight);
@@ -380,7 +381,7 @@ function drawTutorialOverlay(): void {
 function drawMovementTutorial() {
   push();
   textSize(24);
-  text("MOVEMENT", 0, -100);
+  text("MOVEMENT", 0, -160);
 
   const keySize = 50;
   const spacing = 5;
@@ -394,31 +395,21 @@ function drawMovementTutorial() {
   ];
 
   push();
-  translate(0, 20);
+  translate(0, -20);
   
   for (let k of keys) {
-    let label = k[0];
+    let label = k[0] as string;
     let x = k[1] as number;
     let y = k[2] as number;
 
-    // Draw Key Cap
-    fill(235, 226, 214);
-    stroke(77, 61, 47);
-    strokeWeight(2);
-    rectMode(CENTER);
-    rect(x, y, keySize, keySize, 8);
-
-    // Draw Letter
-    noStroke();
-    fill(77, 61, 47);
-    textAlign(CENTER, CENTER);
-    textSize(20);
-    text(label, x, y + 2);
+    drawKey(label, x, y, keySize);
+    drawKey("Shift", 0, 120, 110 );
   }
   pop();
 
   textSize(16);
-  text("Use keys to move the baker", 0, 80);
+  text("Use keys to move the baker", 0, 40);
+  text("Hold SHIFT to Sprint!", 0, 150);
   pop();
 }
 
@@ -678,7 +669,16 @@ function drawGameWorld(): void {
 
   if (gameState === 'PLAYING') {
     spawnTimer += dt;
-    if (player) player.update(tileM, allStations);
+
+    
+    if (player) {
+      if (keyIsDown(SHIFT)) {
+      player.speed = 0.1;
+    } else {
+      player.speed = 0.05;
+    }
+      player.update(tileM, allStations);
+    }
     manageCustomer(dt);
     
     for (let s of stations) {
