@@ -1,8 +1,11 @@
 # **Crumble Quest**
 
 A fast-paced bakery management game built with **p5.ts**. Manage ingredients, bake recipes, and keep your customers happy!
+<br><br>
+**Crumble Quest Link**: https://mizryl.github.io/crumble-quest/
 
 ---
+
 
 ## **Tech Stack**
 
