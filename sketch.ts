@@ -578,7 +578,7 @@ function drawServingTutorial(): void {
   text("TAKE ORDER", 60, -10);
   textSize(12);
   fill(120, 110, 90);
-  text("Stand in front of a guest\nand press E to take orders.", 60, 20);
+  text("Stand in front of a guest\nand press J to take orders.", 60, 20);
   pop();
 
   // --- MIDDLE: Patience Meter ---
