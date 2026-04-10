@@ -171,11 +171,11 @@ function setup(): void {
   stations.push(new Crates(6, 3.5, stationSprites['eggs'], 'egg'));
   stations.push(new Crates(8, 3.5, stationSprites['fruit'], 'fruit'));
   stations.push(new Crates(9, 3.5, stationSprites['flour'], 'flour'));
-  stations.push(new Oven(4, 3.5, stationSprites['oven'], recipeManager, 1));
+  stations.push(new Oven(3, 3.5, stationSprites['oven'], recipeManager, 1));
   stations.push(new Oven(11, 3.5, stationSprites['oven'], recipeManager, 1));
   stations.push(new Oven(12, 3.5, stationSprites['oven'], recipeManager, 1));
   stations.push(new PrepTable(2, 3.5, stationSprites['prep'], recipeManager, 2));
-  stations.push(new PrepTable(3, 3.5, stationSprites['prep'], recipeManager, 2));
+  stations.push(new PrepTable(4, 3.5, stationSprites['prep'], recipeManager, 2));
   stations.push(new PrepTable(7, 3.5, stationSprites['prep'], recipeManager, 2));
   stations.push(new PrepTable(10, 3.5, stationSprites['prep'], recipeManager, 2));
   stations.push(new PrepTable(13, 3.5, stationSprites['prep'], recipeManager, 2));
