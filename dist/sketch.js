@@ -34,7 +34,7 @@ let stationSprites = {};
 //customer
 export let customer = [];
 let spawnTimer = 0;
-const SPAWN_INTERVAL = 10000;
+const SPAWN_INTERVAL = 5000;
 const customerSprites = {
     'c2': { up: [], down: [], left: [], right: [] },
     'c3': { up: [], down: [], left: [], right: [] }
@@ -128,15 +128,16 @@ function setup() {
     keyH = new KeyHandler();
     player = new Player(5, 3, playerSprites, keyH, recipeManager);
     hud = new HUD();
-    stations.push(new Crates(6, 3.5, stationSprites['flour'], 'flour'));
-    stations.push(new Crates(7, 3.5, stationSprites['eggs'], 'egg'));
+    stations.push(new Crates(5, 3.5, stationSprites['flour'], 'flour'));
+    stations.push(new Crates(6, 3.5, stationSprites['eggs'], 'egg'));
     stations.push(new Crates(8, 3.5, stationSprites['fruit'], 'fruit'));
-    stations.push(new Oven(3, 3.5, stationSprites['oven'], recipeManager, 1));
+    stations.push(new Crates(9, 3.5, stationSprites['flour'], 'flour'));
+    stations.push(new Oven(4, 3.5, stationSprites['oven'], recipeManager, 1));
     stations.push(new Oven(11, 3.5, stationSprites['oven'], recipeManager, 1));
     stations.push(new Oven(12, 3.5, stationSprites['oven'], recipeManager, 1));
     stations.push(new PrepTable(2, 3.5, stationSprites['prep'], recipeManager, 2));
-    stations.push(new PrepTable(4, 3.5, stationSprites['prep'], recipeManager, 2));
-    stations.push(new PrepTable(5, 3.5, stationSprites['prep'], recipeManager, 2));
+    stations.push(new PrepTable(3, 3.5, stationSprites['prep'], recipeManager, 2));
+    stations.push(new PrepTable(7, 3.5, stationSprites['prep'], recipeManager, 2));
     stations.push(new PrepTable(10, 3.5, stationSprites['prep'], recipeManager, 2));
     stations.push(new PrepTable(13, 3.5, stationSprites['prep'], recipeManager, 2));
     stations.push(new Trash(0, 3.5, stationSprites['trash']));
@@ -149,8 +150,8 @@ function setup() {
     frontStations.push(new PickupCounter(14, 5.5, stationSprites['pickup-left'], recipeManager));
     frontStations.push(new DisplayCounter(0, 4.5, stationSprites['display']));
     frontStations.push(new DisplayCounter(2, 4.5, stationSprites['display']));
-    frontStations.push(new DisplayCounter(6, 4.5, stationSprites['display']));
-    frontStations.push(new CheckoutCounter(4, 5.5, stationSprites['checkout']));
+    frontStations.push(new DisplayCounter(4, 4.5, stationSprites['display']));
+    frontStations.push(new CheckoutCounter(6, 5.5, stationSprites['checkout']));
     //food
     recipeManager.registerSprite('sponge-cake', loadImage('assets/img/food/sponge-cake.png'));
     recipeManager.registerSprite('fruit-cake', loadImage('assets/img/food/fruit-cake.png'));
@@ -567,10 +568,10 @@ function drawGameWorld() {
         spawnTimer += dt;
         if (player) {
             if (keyIsDown(SHIFT)) {
-                player.speed = 0.1;
+                player.speed = 0.14;
             }
             else {
-                player.speed = 0.05;
+                player.speed = 0.07;
             }
             player.update(tileM, allStations);
         }
@@ -597,7 +598,7 @@ function manageCustomer(dt) {
         if (selectedSprites && allRecipes.length > 0) {
             const randomRecipe = random(allRecipes);
             //vertical line queue
-            const queueX = 5;
+            const queueX = 7;
             const queueY = 5 + (customer.length * 1);
             const c = new Customer(-1, 8, selectedSprites, randomRecipe.id, queueX, queueY, recipeManager, hud, moodSprite);
             customer.push(c);
@@ -612,6 +613,7 @@ function manageCustomer(dt) {
     //removes customer
     customer = customer.filter(c => {
         if (c.state === 'LEAVING' && c.isAtDestination()) {
+            // spawnTimer = 0;
             return false;
         }
         return true;
@@ -620,7 +622,7 @@ function manageCustomer(dt) {
 export function refreshQueue() {
     const waitingArea = customer.filter(c => c.state === 'WALK-IN' || c.state === 'WAITING');
     waitingArea.forEach((c, index) => {
-        const queueX = 5;
+        const queueX = 7;
         const queueY = 5 + index;
         if (c.getTargetX() !== queueX || c.getTargetY() !== queueY) {
             c.setTarget(queueX, queueY);
