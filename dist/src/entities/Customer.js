@@ -1,6 +1,7 @@
 import { Entity } from "./Entity.js";
 import { TileManager } from "../world/TileManager.js";
 import { PickupCounter } from "../stations/PickupCounter.js";
+import { refreshQueue } from "../../sketch.js";
 export class Customer extends Entity {
     constructor(x, y, sprites, recipe, targetX, targetY, recipeManager, hud, mood) {
         super(x, y, true, 0.05, sprites, "Customer");
@@ -196,6 +197,7 @@ export class Customer extends Entity {
     leaveAngry() {
         this.leave();
         this.hud.addScore(-20);
+        refreshQueue();
     }
     displayPatienceIcon() {
         if (this.state !== 'WAITING' && this.state !== 'WAITING_FOR_FOOD' && this.state !== 'ORDERED') {

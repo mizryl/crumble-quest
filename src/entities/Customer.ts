@@ -4,6 +4,7 @@ import { TileManager } from "../world/TileManager.js";
 import { RecipeManager } from "../data/RecipeManager.js";
 import { PickupCounter } from "../stations/PickupCounter.js";
 import { HUD } from "../ui/HUD.js";
+import { refreshQueue } from "../../sketch.js";
 
 
 export class Customer extends Entity {
@@ -234,10 +235,7 @@ export class Customer extends Entity {
         if (this.hud) {
             this.hud.addScore(payment);
         }
-        
-
         this.leave();
-
     }
 
     public leave() {
@@ -253,6 +251,7 @@ export class Customer extends Entity {
     public leaveAngry(): void {
         this.leave();
         this.hud.addScore(-20);
+        refreshQueue();
     }
 
     public displayPatienceIcon() {
