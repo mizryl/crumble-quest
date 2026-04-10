@@ -9,7 +9,6 @@ export class MovementLogger {
   static exportReport(entities: (Player | Customer)[]): void {
     let report: string[] = [];
     
-    // Header Info
     report.push("==========================================");
     report.push("      CRUMBLE QUEST - MOVEMENT LOG       ");
     report.push(`      Generated: ${new Date().toLocaleString()}     `);
@@ -17,7 +16,7 @@ export class MovementLogger {
     report.push("");
 
     // Comparison/Ranking Logic
-    // Sorts the array: Highest totalDistanceMoved at the top
+    // Sorts the array: Highest total Distance Moved at the top
     const ranked = [...entities].sort((a, b) => b.totalDistanceMoved - a.totalDistanceMoved);
 
     report.push("RANKING BY ACTIVITY:");

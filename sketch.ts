@@ -31,8 +31,6 @@ let nextDayBtn: RollingPinButton;
 let returnBtn: Button;
 let downloadBtn: Button;
 
-
-
 let font: any;
 let cloudImg: any;
 
@@ -237,7 +235,7 @@ function draw(): void {
       }
       drawPausedOverlay();
       
-      if (keyIsDown(BACKSPACE)) { // BACKSPACE is a p5 constant (8)
+      if (keyIsDown(BACKSPACE)) {
         if (millis() - lastBackspaceTime > BACKSPACE_DELAY) {
           searchQuery = searchQuery.slice(0, -1);
           lastBackspaceTime = millis();
@@ -256,18 +254,14 @@ function mousePressed(): void {
   switch (gameState) {
     case "START":
       
-    if (bgm && !bgm.isPlaying()) {
-        bgm.loop();
-        bgm.setVolume(0.05);
-      }
+      if (bgm && !bgm.isPlaying()) {
+          bgm.loop();
+          bgm.setVolume(0.05);
+        }
       
       if (startBtn && startBtn.isClicked()) startGame();
       if (loadBtn && loadBtn.isClicked()) loadGame();
-      if (tutorialBtn.isClicked()) { 
-
-        drawTutorialOverlay();
-    }
-      
+      if (tutorialBtn.isClicked()) drawTutorialOverlay();
       break;
 
     case "TUTORIAL": 

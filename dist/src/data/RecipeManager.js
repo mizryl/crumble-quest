@@ -161,27 +161,12 @@ export class RecipeManager {
             let mathName = (r.id.toLowerCase().includes(lowerQuery) ||
                 r.title.toLowerCase().includes(lowerQuery));
             let matchIngredient = r.ingredients.some(ing => ing.toLowerCase().includes(lowerQuery));
-            if (mathName || matchIngredient) {
+            let matchValue = r.value.toString().includes(lowerQuery);
+            if (mathName || matchIngredient || matchValue) {
                 results.push(r);
             }
         }
         return results;
-    }
-    getRecipeSortedByValue() {
-        let sortedList = this.getAllRecipes();
-        let n = sortedList.length;
-        for (let i = 0; i < n - 1; i++) {
-            let maxIndex = i;
-            for (let j = i + 1; j < n; j++) {
-                if (sortedList[j].value > sortedList[maxIndex].value) {
-                    maxIndex = j;
-                }
-            }
-            let temp = sortedList[maxIndex];
-            sortedList[maxIndex] = sortedList[i];
-            sortedList[i] = temp;
-        }
-        return sortedList;
     }
     // Add a parameter for the sort type
     getFilteredRecipes(query, sortType) {
