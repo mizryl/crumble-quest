@@ -35,8 +35,8 @@ This project uses TypeScript. To get the bakery up and running locally, follow t
 | Key | Action |
 | :--- | :--- |
 | **WASD** | Move Baker |
-| **E / Click** | Interact (Pick up / Drop / Take Order) |
-| **F / Space** | Process (Chop / Mix / Bake) |
+| **J / Click** | Interact (Pick up / Drop / Take Order) |
+| **K / Space** | Process (Chop / Mix / Bake) |
 | **ESC** | Toggle Recipe Book & Pause |
 
 ---
