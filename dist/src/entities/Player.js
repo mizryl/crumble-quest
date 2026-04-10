@@ -57,7 +57,7 @@ export class Player extends Entity {
         }
         //boundaries
         nextX = constrain(nextX, 0, (tileM.worldWidth / this.tileSize) - 1);
-        nextY = constrain(nextY, 1.01, (tileM.worldHeight / this.tileSize) - 6);
+        nextY = constrain(nextY, 2.01, (tileM.worldHeight / this.tileSize) - 6);
         //collision 
         let collision = false;
         const playerHB = this.getHitbox(nextX, nextY);
@@ -118,10 +118,10 @@ export class Player extends Entity {
             sensor = { x: interactX + 10, y: (this.y * size) + 128, w: 44, h: reachY };
         }
         else if (this.currentAnimation === this.left) {
-            sensor = { x: interactX - reachX + 10, y: interactY + 10, w: reachX, h: 44 };
+            sensor = { x: interactX - reachX + 30, y: interactY + 10, w: reachX, h: 44 };
         }
         else if (this.currentAnimation === this.right) {
-            sensor = { x: interactX + size - 10, y: interactY + 10, w: reachX, h: 44 };
+            sensor = { x: interactX + size - 30, y: interactY + 10, w: reachX, h: 44 };
         }
         //Collision Check (AABB)
         let targetStation = null;

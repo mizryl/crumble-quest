@@ -47,7 +47,7 @@ let stationSprites: { [key: string]: Image } = {};
 //customer
 export let customer: Customer[]= [];
 let spawnTimer = 0;
-const SPAWN_INTERVAL = 8000;
+const SPAWN_INTERVAL = 10000;
 
 const customerSprites: Record<string, any> = {
   'c2': { up: [], down: [], left: [], right: []},
@@ -87,6 +87,7 @@ let isDownloading = false;
 let bgm: any;
 
 let previousState: string = "START";
+let musicPlaying: boolean = true;
 
 
 function preload(): void {
@@ -163,20 +164,21 @@ function setup(): void {
   //Game-related
   recipeManager = new RecipeManager();
   keyH = new KeyHandler();
-  player = new Player(5, 2, playerSprites, keyH, recipeManager);
+  player = new Player(5, 3, playerSprites, keyH, recipeManager);
   hud = new HUD();
 
-  stations.push(new Crates(6, 2.5, stationSprites['flour'], 'flour'));
-  stations.push(new Crates(7, 2.5, stationSprites['eggs'], 'egg'));
-  stations.push(new Crates(8, 2.5, stationSprites['fruit'], 'fruit'));
-  stations.push(new Oven(3, 2.5, stationSprites['oven'], recipeManager, 1));
-  stations.push(new Oven(11, 2.5, stationSprites['oven'], recipeManager, 1));
-  stations.push(new Oven(12, 2.5, stationSprites['oven'], recipeManager, 1));
-  stations.push(new PrepTable(2, 2.5, stationSprites['prep'], recipeManager, 2));
-  stations.push(new PrepTable(4, 2.5, stationSprites['prep'], recipeManager, 2));
-  stations.push(new PrepTable(10, 2.5, stationSprites['prep'], recipeManager, 2));
-  stations.push(new PrepTable(13, 2.5, stationSprites['prep'], recipeManager, 2));
-  stations.push(new Trash(0, 2.5, stationSprites['trash']));
+  stations.push(new Crates(6, 3.5, stationSprites['flour'], 'flour'));
+  stations.push(new Crates(7, 3.5, stationSprites['eggs'], 'egg'));
+  stations.push(new Crates(8, 3.5, stationSprites['fruit'], 'fruit'));
+  stations.push(new Oven(3, 3.5, stationSprites['oven'], recipeManager, 1));
+  stations.push(new Oven(11, 3.5, stationSprites['oven'], recipeManager, 1));
+  stations.push(new Oven(12, 3.5, stationSprites['oven'], recipeManager, 1));
+  stations.push(new PrepTable(2, 3.5, stationSprites['prep'], recipeManager, 2));
+  stations.push(new PrepTable(4, 3.5, stationSprites['prep'], recipeManager, 2));
+  stations.push(new PrepTable(5, 3.5, stationSprites['prep'], recipeManager, 2));
+  stations.push(new PrepTable(10, 3.5, stationSprites['prep'], recipeManager, 2));
+  stations.push(new PrepTable(13, 3.5, stationSprites['prep'], recipeManager, 2));
+  stations.push(new Trash(0, 3.5, stationSprites['trash']));
   frontStations.push(new PickupCounter(8, 5.5, stationSprites['pickup-left'], recipeManager));
   frontStations.push(new PickupCounter(9, 5.5, stationSprites['pickup-right'], recipeManager));
   frontStations.push(new PickupCounter(10, 5.5, stationSprites['pickup-left'], recipeManager));
@@ -255,7 +257,7 @@ function mousePressed(): void {
       
     if (bgm && !bgm.isPlaying()) {
         bgm.loop();
-        bgm.setVolume(0.1);
+        bgm.setVolume(0.05);
       }
       
       if (startBtn && startBtn.isClicked()) startGame();
@@ -709,7 +711,7 @@ function drawGameWorld(): void {
 function manageCustomer(dt: number): void {
 spawnTimer += deltaTime;
 
-if (customer.length < 5 && spawnTimer > SPAWN_INTERVAL) {
+if (customer.length < 4 && spawnTimer > SPAWN_INTERVAL) {
     const spriteKeys = Object.keys(customerSprites);
     const randomKey = random(spriteKeys);
     const selectedSprites = customerSprites[randomKey];
@@ -750,7 +752,9 @@ export function refreshQueue() {
   waitingArea.forEach((c, index) => {
     const queueX = 5;
     const queueY = 5 + index;
-    c.setTarget(queueX, queueY);
+    if (c.getTargetX() !== queueX || c.getTargetY() !== queueY) {
+      c.setTarget(queueX, queueY);
+    }
   });
 }
 
@@ -997,6 +1001,19 @@ function keyPressed() {
     }
     
     return false;
+  }
+
+  if (key === '1') {
+    if (bgm.isPlaying()) {
+      bgm.pause();
+      musicPlaying = false;
+      console.log("Music Paused");
+    } else {
+      bgm.loop();
+      bgm.setVolume(0.05);
+      musicPlaying = true;
+      console.log("Music Resumed");
+    }
   }
 
   if (gameState === 'PAUSED') {
